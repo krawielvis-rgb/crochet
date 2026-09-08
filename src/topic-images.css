@@ -1,0 +1,6 @@
+.photo-topic{background-position:center;background-size:cover;color:#fff;isolation:isolate;text-shadow:0 1px 8px rgba(20,28,25,.75)}
+.photo-topic:before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(20,28,25,.12),rgba(20,28,25,.72));z-index:-1}
+.beginner-topic{background-image:url('/images/beginner-crochet.png')}
+.wear-topic{background-image:url('/images/crochet-wearables.png')}
+.ami-topic{background-image:url('/images/amigurumi-bear.png')}
+.home-topic{background-image:url('/images/crochet-home-decor.png')}
