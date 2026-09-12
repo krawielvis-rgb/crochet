@@ -5,3 +5,4 @@
   "display_url": "https://github.com/krawielvis-rgb/crochet/blob/main/src/post.css",
   "display_title": "post.css"
 }
+.site-header .brand > span:last-child{font-size:0}.site-header .brand > span:last-child::after{content:'Sara Rain Crochet';font-size:inherit}.site-header .brand{white-space:nowrap}
