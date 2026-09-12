@@ -1,7 +1,19 @@
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 
+const tutorialEnhancer = {
+  name: 'crochet-tutorial-enhancer',
+  transformIndexHtml(html, ctx) {
+    const path = ctx.path || ''
+    if (!path.includes('/posts/')) return html
+    const adcash = html.includes('acscdn.com/script/aclib.js') ? '' : `<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script><script type="text/javascript">aclib.runAutoTag({ zoneId: '5j7scxnbvh' });</script>`
+    const enhancer = '<script type="module" src="/src/tutorial-enhancements.js"></script>'
+    return html.replace('</head>', `${adcash}${enhancer}</head>`)
+  }
+}
+
 export default defineConfig({
+  plugins: [tutorialEnhancer],
   build: {
     rollupOptions: {
       input: {
