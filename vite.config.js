@@ -1,5 +1,6 @@
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
+import seoContentUpgrade from './src/seo-upgrade.js'
 
 const site = 'https://crochet.krawielvis.workers.dev'
 
@@ -80,7 +81,7 @@ const tutorialEnhancer = {
 }
 
 export default defineConfig({
-  plugins: [tutorialEnhancer],
+  plugins: [tutorialEnhancer, seoContentUpgrade],
   build: {
     rollupOptions: {
       input: {
