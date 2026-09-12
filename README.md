@@ -1,23 +1,30 @@
-# Crochet Journal
+# Crochet Journal - With Real Pins
 
-A responsive, SEO-ready editorial blog for crochet tutorials, materials guides, and handmade-project inspiration.
+This is your original repo with the 25 generated Pinterest pins wired in.
 
-## Included
-
-- Homepage with a featured guide, topic discovery, article cards, and newsletter interaction
-- Four long-form, search-oriented tutorial and guide pages
-- Page-level titles, descriptions, canonical URLs, Open Graph basics, and WebSite structured data
-- Responsive layout with original CSS-based editorial artwork
+## What's new vs your GitHub
+- Added `public/images/pins/` with all 25 pins: pin-first-crochet-project.jpg through pin-seasonal-crochet-projects.jpg
+- Replaced code-drawn placeholders with real <img> tags in Home and Tutorial pages
+- Responsive layout, SEO titles, OG tags, WebSite structured data kept
 
 ## Run locally
-
-```bash
+```
 npm install
 npm run start
 ```
+Build:
+```
+npm run build
+```
 
-Run `npm run build` to create a production build in `dist/`.
+## How to push to your existing repo
+1. Download this new repo zip
+2. Unzip, then copy everything into your local `crochet` clone (overwrite)
+3. 
+```
+git add .
+git commit -m "Integrate 25 generated Pinterest pins, replace placeholders"
+git push origin main
+```
 
-## Image assets
-
-The initial build uses custom code-drawn artwork as visual placeholders. Replace these with generated cover images in the matching article cards and hero section once image generation is enabled.
+Your pins are in: public/images/pins/

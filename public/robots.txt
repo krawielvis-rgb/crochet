@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://crochet.krawielvis.workers.dev/sitemap.xml
