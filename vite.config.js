@@ -6,10 +6,12 @@ export default defineConfig({
     rollupOptions: {
       input: {
         home: resolve(import.meta.dirname, 'index.html'),
+        pinterestTutorials: resolve(import.meta.dirname, 'pinterest-tutorials.html'),
         firstProject: resolve(import.meta.dirname, 'posts/first-crochet-project.html'),
         grannySquare: resolve(import.meta.dirname, 'posts/granny-square.html'),
         yarnGuide: resolve(import.meta.dirname, 'posts/yarn-guide.html'),
         amigurumi: resolve(import.meta.dirname, 'posts/amigurumi.html'),
+        crochetFlower: resolve(import.meta.dirname, 'posts/crochet-flower.html'),
         howToReadCrochetPatterns: resolve(import.meta.dirname, 'posts/how-to-read-crochet-patterns.html'),
         singleVsDoubleCrochet: resolve(import.meta.dirname, 'posts/single-vs-double-crochet.html'),
         crochetHookSizesGuide: resolve(import.meta.dirname, 'posts/crochet-hook-sizes-guide.html'),
