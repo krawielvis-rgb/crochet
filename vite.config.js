@@ -5,6 +5,9 @@ const tutorialEnhancer = {
   name: 'crochet-tutorial-enhancer',
   transformIndexHtml(html, ctx) {
     const path = ctx.path || ''
+    if (path === '/' || path.endsWith('/index.html')) {
+      return html.replace('25 tutorials.<br /><em>25 projects.</em>', 'Sara Rain Crochet')
+    }
     if (!path.includes('/posts/')) return html
     const adcash = html.includes('acscdn.com/script/aclib.js') ? '' : `<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script><script type="text/javascript">aclib.runAutoTag({ zoneId: '5j7scxnbvh' });</script>`
     const enhancer = '<script type="module" src="/src/tutorial-enhancements.js"></script>'
