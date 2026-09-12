@@ -64,7 +64,7 @@ const tutorialEnhancer = {
     const info = seo[slug]
     if (!info) return html
     const adcash = html.includes('acscdn.com/script/aclib.js') ? '' : `<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script><script type="text/javascript">aclib.runAutoTag({ zoneId: '5j7scxnbvh' });</script>`
-    const enhancer = '<script type="module" src="/src/tutorial-enhancements.js"></script>'
+    const enhancer = '<script type="module" src="/src/tutorial-enhancements.js"></script><script type="module" src="/src/deep-tutorials.js"></script>'
     const image = `/images/pins/pin-${slug}.jpg`
     const url = `${site}/posts/${slug}.html`
     const relatedLinks = info.related.map(r => `<a href="/posts/${r}.html">${labels[r] || r}</a>`).join('')
