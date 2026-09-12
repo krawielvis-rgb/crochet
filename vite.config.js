@@ -80,8 +80,26 @@ const tutorialEnhancer = {
   }
 }
 
+// Keep every tutorial as one continuous long-form guide. The previous related-tutorial
+// card interrupted the article and made the injected pattern sections look like a second
+// tutorial. This post-build cleanup removes that interruption and flattens visual cards.
+const cohesiveTutorialPlugin = {
+  name: 'cohesive-tutorial-layout',
+  enforce: 'post',
+  transformIndexHtml(html, ctx) {
+    const path = ctx.path || ''
+    if (!path.includes('/posts/')) return html
+
+    return html
+      .replace(/<section class="related-tutorials"[\s\S]*?<\/section>/gi, '')
+      .replace(/<style>\.related-tutorials\{[\s\S]*?<\/style>/gi, '')
+      .replace(/class="pattern-card"/gi, 'class="tutorial-continuation"')
+      .replace('</head>', '<style>.tutorial-continuation{margin:48px 0 0;padding:0;border:0;background:transparent}.tutorial-continuation h2{margin-top:48px}.tutorial-continuation h3{margin-top:34px}.tutorial-continuation p{margin-bottom:22px}.tutorial-continuation ol,.tutorial-continuation ul{margin-bottom:28px}</style></head>')
+  }
+}
+
 export default defineConfig({
-  plugins: [tutorialEnhancer, seoContentUpgrade],
+  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin],
   build: {
     rollupOptions: {
       input: {
