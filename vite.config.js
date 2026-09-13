@@ -29,7 +29,8 @@ const seo = {
   'how-to-join-yarn': { title: 'How to Join Yarn in Crochet — Clean Yarn Changes', description: 'Learn practical ways to join a new yarn color or skein in crochet while keeping joins secure and reducing bulky ends.', related: ['yarn-guide','crochet-tension-guide','how-to-fix-crochet-mistakes'] },
   'crochet-vs-store-bought': { title: 'Crochet vs Store-Bought — Why Handmade Is Different', description: 'Explore the practical differences between handmade crochet and store-bought items, including customization, materials, time, and value.', related: ['crochet-gift-ideas','crochet-market-bag','seasonal-crochet-projects'] },
   'crochet-market-bag': { title: 'Easy Crochet Market Bag Pattern — Reusable Beginner Project', description: 'Make a reusable crochet market bag and learn practical shaping, openwork construction, handles, and finishing for everyday use.', related: ['crochet-gift-ideas','crochet-blanket-for-beginners','how-to-crochet-a-scarf'] },
-  'seasonal-crochet-projects': { title: 'Seasonal Crochet Project Ideas — Projects for Every Season', description: 'Plan crochet projects for every season with ideas for cozy winter makes, spring accessories, summer bags, and autumn home decor.', related: ['crochet-gift-ideas','crochet-market-bag','crochet-blanket-for-beginners'] }
+  'seasonal-crochet-projects': { title: 'Seasonal Crochet Project Ideas — Projects for Every Season', description: 'Plan crochet projects for every season with ideas for cozy winter makes, spring accessories, summer bags, and autumn home decor.', related: ['crochet-gift-ideas','crochet-market-bag','crochet-blanket-for-beginners'] },
+  'crochet-pencil-bag': { title: 'Crochet Pencil Bag — Beginner Zipper Pouch Pattern', description: 'A beginner-friendly zippered crochet pencil bag pattern with lining, zipper insertion, and tassel finishing steps.', related: ['crochet-market-bag','crochet-gift-ideas','crochet-coasters-pattern'] }
 }
 
 const labels = {
@@ -39,7 +40,7 @@ const labels = {
   'how-to-fix-crochet-mistakes':'Fix Common Crochet Mistakes','magic-ring-tutorial':'Magic Ring Tutorial','amigurumi':'Amigurumi for Beginners','first-crochet-project':'First Crochet Project',
   'crochet-blanket-for-beginners':'Beginner Crochet Blanket','how-to-crochet-a-scarf':'How to Crochet a Scarf','crochet-gift-ideas':'Crochet Gift Ideas','how-to-block-crochet':'How to Block Crochet',
   'c2c-crochet-guide':'C2C Crochet Guide','how-to-join-yarn':'How to Join Yarn','crochet-market-bag':'Crochet Market Bag','seasonal-crochet-projects':'Seasonal Crochet Projects',
-  'crochet-vs-knitting':'Crochet vs Knitting','crochet-vs-store-bought':'Crochet vs Store-Bought'
+  'crochet-vs-knitting':'Crochet vs Knitting','crochet-vs-store-bought':'Crochet vs Store-Bought','crochet-pencil-bag':'Crochet Pencil Bag'
 }
 
 const tutorialSlugs = Object.keys(seo)
