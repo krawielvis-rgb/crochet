@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Sara Rain Crochet sitemap -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://crochet.krawielvis.workers.dev/</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://crochet.krawielvis.workers.dev/pinterest-tutorials.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://crochet.krawielvis.workers.dev/</loc><lastmod>2026-09-13</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://crochet.krawielvis.workers.dev/pinterest-tutorials.html</loc><lastmod>2026-09-13</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/first-crochet-project.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/granny-square.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/yarn-guide.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
@@ -34,4 +34,5 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url><loc>https://crochet.krawielvis.workers.dev/posts/sunflower-granny-square.html</loc><lastmod>2026-09-13</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
