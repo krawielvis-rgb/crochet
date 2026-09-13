@@ -49,7 +49,6 @@ const tutorialEnhancer = {
   name: 'crochet-tutorial-enhancer',
   transformIndexHtml(html, ctx) {
     const path = ctx.path || ''
-
     if (path === '/' || path.endsWith('/index.html')) {
       const schema = `<script type="application/ld+json">${JSON.stringify({
         '@context': 'https://schema.org', '@type': 'WebSite', name: 'Sara Rain Crochet', url: `${site}/`,
@@ -59,9 +58,7 @@ const tutorialEnhancer = {
       return html.replace('25 tutorials.<br /><em>25 projects.</em>', 'Sara Rain Crochet')
         .replace('</head>', `${schema}<meta name="robots" content="index,follow,max-image-preview:large" /><meta property="og:image" content="${site}/images/pins/pin-first-crochet-project.jpg" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="Sara Rain Crochet — Beginner Crochet Patterns & Tutorials" /><meta name="twitter:description" content="Practical crochet patterns and beginner-friendly tutorials." /><meta name="twitter:image" content="${site}/images/pins/pin-first-crochet-project.jpg" /></head>`)
     }
-
     if (!path.includes('/posts/')) return html
-
     const slug = path.split('/posts/')[1]?.replace(/\.html$/, '') || ''
     const info = seo[slug]
     if (!info) return html
@@ -81,16 +78,12 @@ const tutorialEnhancer = {
   }
 }
 
-// Keep every tutorial as one continuous long-form guide. The previous related-tutorial
-// card interrupted the article and made the injected pattern sections look like a second
-// tutorial. This post-build cleanup removes that interruption and flattens visual cards.
 const cohesiveTutorialPlugin = {
   name: 'cohesive-tutorial-layout',
   enforce: 'post',
   transformIndexHtml(html, ctx) {
     const path = ctx.path || ''
     if (!path.includes('/posts/')) return html
-
     return html
       .replace(/<section class="related-tutorials"[\s\S]*?<\/section>/gi, '')
       .replace(/<style>\.related-tutorials\{[\s\S]*?<\/style>/gi, '')
@@ -99,8 +92,19 @@ const cohesiveTutorialPlugin = {
   }
 }
 
+const homepagePencilBagPlugin = {
+  name: 'homepage-pencil-bag-card',
+  transformIndexHtml(html, ctx) {
+    const path = ctx.path || ''
+    if (!(path === '/' || path.endsWith('/index.html'))) return html
+    const card = `<a class="pinterest-card" href="/posts/crochet-pencil-bag.html"><img src="/images/pins/pin-crochet-pencil-bag.jpg" alt="Crochet Pencil Bag" loading="lazy"><div class="pinterest-card-content"><h3>Crochet Pencil Bag</h3><span>Read tutorial →</span></div></a>`
+    if (html.includes('href="/posts/crochet-pencil-bag.html"')) return html
+    return html.replace(/(<a class="pinterest-card" href="\/posts\/sunflower-granny-square\.html">[\s\S]*?<\/a>)/, `$1\n      ${card}`)
+  }
+}
+
 export default defineConfig({
-  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin],
+  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin],
   build: {
     rollupOptions: {
       input: {
