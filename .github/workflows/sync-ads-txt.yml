@@ -1,0 +1,28 @@
+name: Sync HBAgency ads.txt
+
+on:
+  push:
+    paths:
+      - ads.txt
+      - .github/workflows/sync-ads-txt.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy ads.txt to public
+        run: |
+          cp ads.txt public/ads.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/ads.txt
+          if git diff --cached --quiet; then
+            echo "public/ads.txt is already up to date"
+          else
+            git commit -m "Sync HBAgency ads.txt to public"
+            git push
+          fi
