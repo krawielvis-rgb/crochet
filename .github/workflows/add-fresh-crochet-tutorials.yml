@@ -1,0 +1,28 @@
+name: Add fresh crochet tutorials
+on:
+  push:
+    paths:
+      - ".github/workflows/add-fresh-crochet-tutorials.yml"
+permissions:
+  contents: write
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore fresh tutorial bundle
+        env:
+          BUNDLE_B64: PLACEHOLDER
+        run: |
+          echo "$BUNDLE_B64" | base64 -d > /tmp/fresh25.tar.gz
+          tar -xzf /tmp/fresh25.tar.gz -C .
+          rm -f public/posts/_fresh_test_marker.txt
+      - name: Commit fresh tutorials
+        run: |
+          rm -f .github/workflows/add-fresh-crochet-tutorials.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add posts index.html public/sitemap.xml public/images/pins .github/workflows/add-fresh-crochet-tutorials.yml
+          git commit -m "Add 25 fresh long-form crochet tutorials"
+          git push
