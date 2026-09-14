@@ -1,0 +1,6 @@
+# Header Bidding Agency SaraRainCrochet 
+# info@hbagency.it
+managerdomain=hbagency.it
+ownerdomain=crochet.krawielvis.workers.dev
+headerbidding.agency, 43588, DIRECT
+hbagency.it, 43588, DIRECT
