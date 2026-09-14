@@ -1,0 +1,125 @@
+name: AdSense site optimization
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Optimize site for AdSense and publisher quality
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          import html
+
+          SITE = 'https://crochet.krawielvis.workers.dev'
+          root = Path('.')
+          html_files = [p for p in root.rglob('*.html') if '.git' not in p.parts and 'node_modules' not in p.parts and 'dist' not in p.parts]
+
+          def esc(s):
+              return html.escape(s, quote=True)
+
+          def page_url(p):
+              rel = p.relative_to(root).as_posix()
+              if rel == 'index.html':
+                  return SITE + '/'
+              return SITE + '/' + rel
+
+          def title_from_doc(text, fallback):
+              m = re.search(r'<title[^>]*>(.*?)</title>', text, re.I | re.S)
+              if m:
+                  return re.sub(r'\\s+', ' ', html.unescape(re.sub('<[^>]+>', '', m.group(1)))).strip()
+              m = re.search(r'<h1[^>]*>(.*?)</h1>', text, re.I | re.S)
+              if m:
+                  return re.sub(r'\\s+', ' ', html.unescape(re.sub('<[^>]+>', '', m.group(1)))).strip()
+              return fallback
+
+          def inject_head(text, marker, block):
+              if marker.lower() in text.lower():
+                  return text
+              return re.sub(r'</head>', block + '\n</head>', text, count=1, flags=re.I)
+
+          for p in html_files:
+              text = p.read_text(encoding='utf-8')
+              original = text
+              url = page_url(p)
+              fallback = p.stem.replace('-', ' ').title()
+              title = title_from_doc(text, fallback)
+
+              if not re.search(r'<meta[^>]+name=["\']robots["\']', text, re.I):
+                  block = '<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">'
+                  text = inject_head(text, 'max-image-preview:large', block)
+
+              if not re.search(r'<meta[^>]+name=["\']author["\']', text, re.I):
+                  text = inject_head(text, 'name="author"', '<meta name="author" content="Sara Rain Crochet">')
+
+              if not re.search(r'<meta[^>]+property=["\']og:site_name["\']', text, re.I):
+                  text = inject_head(text, 'og:site_name', '<meta property="og:site_name" content="Sara Rain Crochet">')
+
+              if not re.search(r'<meta[^>]+name=["\']twitter:card["\']', text, re.I):
+                  text = inject_head(text, 'twitter:card', '<meta name="twitter:card" content="summary_large_image">')
+
+              if not re.search(r'<link[^>]+rel=["\']canonical["\']', text, re.I):
+                  text = inject_head(text, 'rel="canonical"', f'<link rel="canonical" href="{esc(url)}">')
+
+              if not re.search(r'WebSite.*schema.org', text, re.I | re.S) and p.name == 'index.html':
+                  schema = '''<script type="application/ld+json">{\"@context\":\"https://schema.org\",\"@type\":\"WebSite\",\"name\":\"Sara Rain Crochet\",\"url\":\"https://crochet.krawielvis.workers.dev/\",\"description\":\"Practical crochet patterns, beginner-friendly tutorials, and handmade inspiration.\"}</script>'''
+                  text = inject_head(text, '"@type":"WebSite"', schema)
+
+              if p.name != 'index.html' and '/posts/' in ('/' + p.relative_to(root).as_posix()):
+                  if not re.search(r'itemtype=["\']https://schema.org/Article["\']', text, re.I) and not re.search(r'"@type"\s*:\s*"Article"', text, re.I):
+                      schema = f'''<script type="application/ld+json">{{"@context":"https://schema.org","@type":"Article","headline":{__import__('json').dumps(title)},"description":{__import__('json').dumps(title + ' — a practical crochet tutorial from Sara Rain Crochet.')},"mainEntityOfPage":{{"@type":"WebPage","@id":{__import__('json').dumps(url)}}},"author":{{"@type":"Organization","name":"Sara Rain Crochet","url":{__import__('json').dumps(SITE + '/')}}},"publisher":{{"@type":"Organization","name":"Sara Rain Crochet","url":{__import__('json').dumps(SITE + '/')}}}}}</script>'''
+                      text = inject_head(text, '"@type":"Article"', schema)
+
+              if text != original:
+                  p.write_text(text, encoding='utf-8')
+
+          # Create a clear cookie policy page. It describes advertising/cookies without
+          # falsely claiming AdSense is already active before Google approval.
+          cookie = root / 'cookie-policy.html'
+          if not cookie.exists():
+              cookie.write_text('''<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>Cookie Policy | Sara Rain Crochet</title>\n<meta name="description" content="Cookie and similar technology information for Sara Rain Crochet.">\n<meta name="robots" content="index,follow,max-image-preview:large">\n<link rel="canonical" href="https://crochet.krawielvis.workers.dev/cookie-policy.html">\n</head>\n<body style="max-width:850px;margin:0 auto;padding:48px 22px;font-family:Arial,sans-serif;line-height:1.7;color:#21312c;background:#f7f4ed">\n<p><a href="/">← Sara Rain Crochet</a></p>\n<h1>Cookie Policy</h1>\n<p>This page explains how Sara Rain Crochet may use cookies and similar technologies to keep the website working, understand how visitors use the site, and support advertising when advertising services are enabled.</p>\n<h2>Essential technologies</h2>\n<p>Some technologies may be necessary for basic website functionality, security, performance, or remembering a preference. These technologies do not require the same choices as optional advertising technologies where consent is required by law.</p>\n<h2>Analytics and advertising</h2>\n<p>If analytics or advertising services are enabled, third-party providers may use cookies, local storage, pixels, or similar technologies to measure traffic, prevent abuse, measure advertising performance, or personalize advertising where permitted and consented to.</p>\n<p>At the time of publication, no advertising network is being represented on this page as already approved or active. If Google AdSense is enabled, its advertising and consent settings will be reflected in the website privacy and consent experience.</p>\n<h2>Your choices</h2>\n<p>Where consent is legally required, visitors will be given an appropriate consent choice before optional advertising or personalization technologies are used. You can also control cookies through your browser settings. Blocking some technologies may affect website functionality.</p>\n<h2>Questions</h2>\n<p>For privacy or cookie questions, contact <a href="mailto:sara.business.rain@gmail.com">sara.business.rain@gmail.com</a>.</p>\n<p><a href="/privacy-policy.html">Privacy Policy</a> · <a href="/terms.html">Terms</a> · <a href="/contact.html">Contact</a></p>\n</body>\n</html>\n''', encoding='utf-8')
+
+          # Add cookie policy to existing sitemap if present.
+          sitemap = root / 'sitemap.xml'
+          if sitemap.exists():
+              s = sitemap.read_text(encoding='utf-8')
+              if 'cookie-policy.html' not in s:
+                  entry = '  <url><loc>' + SITE + '/cookie-policy.html</loc></url>\n'
+                  s = s.replace('</urlset>', entry + '</urlset>')
+                  sitemap.write_text(s, encoding='utf-8')
+
+          # Add a conservative site-wide footer link to the cookie policy when a footer exists.
+          for p in html_files:
+              text = p.read_text(encoding='utf-8')
+              if 'cookie-policy.html' in text:
+                  continue
+              if re.search(r'<footer\\b', text, re.I):
+                  text = re.sub(r'(</footer>)', '<div style="margin-top:10px"><a href="/cookie-policy.html">Cookie Policy</a></div>\\1', text, count=1, flags=re.I)
+                  p.write_text(text, encoding='utf-8')
+
+      - name: Verify site has no HBAgency integration and no accidental ad code
+        run: |
+          if git grep -n -I -E 'hbagency|prebid_hb|HB_Footer_Close|stylehb\\.css' -- . ':!\.github/workflows/adsense-optimization.yml'; then
+            echo 'Unexpected HBAgency reference remains.'
+            exit 1
+          fi
+
+      - name: Commit optimization
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git rm -f .github/workflows/adsense-optimization.yml
+          git commit -m 'Optimize site for AdSense readiness' || exit 0
+          git push origin HEAD:main
