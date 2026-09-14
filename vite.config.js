@@ -62,7 +62,6 @@ const tutorialEnhancer = {
     const slug = path.split('/posts/')[1]?.replace(/\.html$/, '') || ''
     const info = seo[slug]
     if (!info) return html
-    const adcash = html.includes('acscdn.com/script/aclib.js') ? '' : `<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script><script type="text/javascript">aclib.runAutoTag({ zoneId: '5j7scxnbvh' });</script>`
     const enhancer = '<script type="module" src="/src/tutorial-enhancements.js?v=3"></script><script type="module" src="/src/deep-tutorials.js?v=3"></script>'
     const image = `/images/pins/pin-${slug}.jpg`
     const url = `${site}/posts/${slug}.html`
