@@ -1,7 +1,6 @@
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import seoContentUpgrade from './src/seo-upgrade.js'
-import hbPlacementsPlugin from './src/hb-placements.js'
 
 const site = 'https://crochet.krawielvis.workers.dev'
 
@@ -104,7 +103,7 @@ const homepagePencilBagPlugin = {
 }
 
 export default defineConfig({
-  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, hbPlacementsPlugin],
+  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin],
   build: {
     rollupOptions: {
       input: {
