@@ -1,0 +1,55 @@
+name: Switch to HBAgency
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  switch-ad-network:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove Adcash and add HBAgency header
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          hba = '<script src="https://d3u598arehftfk.cloudfront.net/prebid_hb_39749_43588.js" async></script>'
+          hba_css = '<link rel="stylesheet" href="https://hbagency.it/cdn/stylehb.css">'
+          changed = []
+
+          for p in Path('.').rglob('*.html'):
+              if any(part in {'.git', 'node_modules', 'dist'} for part in p.parts):
+                  continue
+              s = p.read_text(encoding='utf-8')
+              original = s
+
+              s = re.sub(r'\s*<script[^>]*(?:aclib|acscdn)[^>]*>\s*</script>\s*<script[^>]*>\s*aclib\.runAutoTag\(.*?\)\s*;?\s*</script>', '', s, flags=re.I|re.S)
+              s = re.sub(r'\s*<script[^>]*src=["\'][^"\']*acscdn\.com[^"\']*["\'][^>]*>\s*</script>', '', s, flags=re.I|re.S)
+              s = re.sub(r'\s*<script[^>]*>\s*aclib\.runAutoTag\(.*?\)\s*;?\s*</script>', '', s, flags=re.I|re.S)
+
+              if 'prebid_hb_39749_43588.js' not in s and re.search(r'</head>', s, flags=re.I):
+                  s = re.sub(r'</head>', f'  {hba}\n  {hba_css}\n</head>', s, count=1, flags=re.I)
+
+              if s != original:
+                  p.write_text(s, encoding='utf-8')
+                  changed.append(str(p))
+
+          print('Updated', len(changed), 'HTML files')
+          for p in changed:
+              print(p)
+          PY
+
+      - name: Remove temporary workflow and commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/switch-ad-network.yml
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Switch site advertising from Adcash to HBAgency"
+            git push
+          fi
