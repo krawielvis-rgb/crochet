@@ -1,0 +1,32 @@
+name: Fix public page styles
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  copy-styles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish shared styles for static public pages
+        run: |
+          mkdir -p public/src
+          cp src/style.css public/src/style.css
+          cp src/post.css public/src/post.css
+      - name: Commit styles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/src/style.css public/src/post.css
+          git commit -m "Fix styling for public information pages"
+          git push
+      - name: Remove one-time workflow
+        if: success()
+        run: |
+          git rm .github/workflows/fix-public-page-styles.yml
+          git commit -m "Remove one-time style fix workflow"
+          git push
