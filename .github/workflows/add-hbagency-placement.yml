@@ -1,0 +1,73 @@
+name: Add HBAgency in-page placement
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add HBAgency placement and remove Adcash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          placement = '''<div class="hb-ad-inpage">\n    <div class="hb-ad-inner">\n    <div class="hbagency_cls hbagency_space_341648"></div></div> </div>'''
+
+          html_files = [p for p in Path('.').rglob('*.html') if '.git' not in p.parts and 'node_modules' not in p.parts and 'dist' not in p.parts]
+          changed = []
+
+          for path in html_files:
+              text = path.read_text(encoding='utf-8')
+              original = text
+
+              # Remove any legacy Adcash AutoTag code.
+              text = re.sub(r'<script[^>]*src=["\'](?:https?:)?//acscdn\.com/script/aclib\.js["\'][^>]*></script>\s*', '', text, flags=re.I)
+              text = re.sub(r'<script[^>]*>\s*aclib\.runAutoTag\([\s\S]*?</script>\s*', '', text, flags=re.I)
+
+              # Add the supplied HBAgency in-page placement once.
+              if 'hbagency_space_341648' not in text:
+                  if re.search(r'<article\b[^>]*>', text, flags=re.I):
+                      text = re.sub(r'(<article\b[^>]*>)', r'\1\n' + placement, text, count=1, flags=re.I)
+                  elif re.search(r'<main\b[^>]*>', text, flags=re.I):
+                      text = re.sub(r'(<main\b[^>]*>)', r'\1\n' + placement, text, count=1, flags=re.I)
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  changed.append(str(path))
+
+          # Remove the old Adcash fallback from the Vite HTML transform too.
+          config = Path('vite.config.js')
+          text = config.read_text(encoding='utf-8')
+          original = text
+          text = re.sub(r"\s*const adcash = html\.includes\('acscdn\.com/script/aclib\.js'\) \? '' : `[^`]*`;", "", text)
+          text = text.replace('${schema}${social}${relatedCss}${adcash}${enhancer}', '${schema}${social}${relatedCss}${enhancer}')
+          if text != original:
+              config.write_text(text, encoding='utf-8')
+              changed.append('vite.config.js')
+
+          print('Changed:', *changed, sep='\n- ')
+          PY
+
+      - name: Commit and self-delete workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/add-hbagency-placement.yml
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add HBAgency in-page placement"
+            git push
+          fi
