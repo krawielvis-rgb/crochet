@@ -74,7 +74,7 @@ const tutorialEnhancer = {
     const social = `<meta name="robots" content="index,follow,max-image-preview:large" /><meta name="description" content="${info.description}" /><link rel="canonical" href="${url}" /><meta property="og:title" content="${info.title}" /><meta property="og:description" content="${info.description}" /><meta property="og:type" content="article" /><meta property="og:url" content="${url}" /><meta property="og:image" content="${site}${image}" /><meta property="og:site_name" content="Sara Rain Crochet" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${info.title}" /><meta name="twitter:description" content="${info.description}" /><meta name="twitter:image" content="${site}${image}" />`
     const relatedCss = `<style>.related-tutorials{margin:42px 0;padding:28px;border:1px solid rgba(25,48,43,.12);background:#f7f4ed}.related-tutorials h2{margin-top:0}.related-tutorials nav{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.related-tutorials nav a{display:inline-block;padding:9px 13px;border:1px solid rgba(25,48,43,.16);text-decoration:none}.related-tutorials nav a:hover{text-decoration:underline}</style>`
     const withRelated = html.replace('</article>', `${relatedBlock}</article>`)
-    return withRelated.replace(/<title>[^<]*<\/title>/i, `<title>${info.title}</title>`).replace(/<meta name="description" content="[^"]*"\s*\/>/i, '').replace('</head>', `${schema}${social}${relatedCss}${adcash}${enhancer}</head>`)
+    return withRelated.replace(/<title>[^<]*<\/title>/i, `<title>${info.title}</title>`).replace(/<meta name="description" content="[^"]*"\s*\/>/i, '').replace('</head>', `${schema}${social}${relatedCss}${enhancer}</head>`)
   }
 }
 
