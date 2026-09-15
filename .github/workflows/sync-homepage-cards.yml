@@ -1,0 +1,83 @@
+name: Sync homepage tutorial cards
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data/posts.json
+      - .github/workflows/sync-homepage-cards.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update homepage cards
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          import html
+          import re
+
+          data = json.loads(Path('data/posts.json').read_text())
+          index = Path('index.html')
+          text = index.read_text()
+
+          marker = '<div class="pinterest-grid">'
+          start = text.find(marker)
+          if start == -1:
+              raise SystemExit('Pinterest grid not found in index.html')
+
+          # Only add cards that are not already present. Existing hand-curated
+          # cards keep their current order and markup.
+          additions = []
+          for post in data:
+              slug = str(post.get('slug') or '').strip()
+              title = str(post.get('title') or '').strip()
+              image = str(post.get('image') or '').strip()
+              if not slug or not title or not image:
+                  continue
+              href = f'/posts/{slug}.html'
+              if href in text:
+                  continue
+              alt = html.escape(title, quote=True)
+              href_e = html.escape(href, quote=True)
+              image_e = html.escape(image, quote=True)
+              title_e = html.escape(title)
+              additions.append(
+                  f'      <a class="pinterest-card" href="{href_e}">'
+                  f'<img src="{image_e}" alt="{alt}" loading="lazy">'
+                  f'<div class="pinterest-card-content"><h3>{title_e}</h3>'
+                  f'<span>Read tutorial →</span></div></a>\n'
+              )
+
+          if not additions:
+              print('Homepage already contains every published tutorial.')
+              raise SystemExit(0)
+
+          # Insert new cards immediately after the opening grid tag. This keeps
+          # newly published tutorials visible at the front of the homepage.
+          text = text[:start + len(marker)] + '\n' + ''.join(additions) + text[start + len(marker):]
+          index.write_text(text)
+          print(f'Added {len(additions)} homepage card(s).')
+          PY
+
+      - name: Commit homepage changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No homepage changes to commit."
+            exit 0
+          fi
+          git commit -m "Sync homepage cards with published tutorials"
+          git push
