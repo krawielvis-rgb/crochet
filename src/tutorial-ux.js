@@ -149,22 +149,42 @@
     });
   };
 
+  const addStyles = () => {
+    if (document.querySelector('#distributed-visual-step-style')) return;
+    const style = document.createElement('style');
+    style.id = 'distributed-visual-step-style';
+    style.textContent = `
+      .distributed-visual-step{margin:38px 0 48px;padding:0;background:transparent}
+      .distributed-visual-step img{display:block;width:100%;max-width:760px;height:auto;max-height:620px;object-fit:cover;border-radius:18px;box-shadow:0 14px 38px rgba(38,53,47,.13);margin:0 auto}
+      .distributed-visual-step figcaption{display:flex;align-items:baseline;gap:12px;max-width:760px;margin:12px auto 0;padding:0 4px;color:#68736d;font-family:Arial,sans-serif;font-size:.88rem}
+      .distributed-visual-step figcaption span{color:#45695a;text-transform:uppercase;letter-spacing:.1em;font-size:.68rem;font-weight:700;white-space:nowrap}
+      .distributed-visual-step figcaption strong{font-family:Georgia,"Times New Roman",serif;color:#26352f;font-size:1.05rem;font-weight:600}
+      @media(max-width:760px){.distributed-visual-step{margin:30px 0 40px}.distributed-visual-step img{border-radius:14px}.distributed-visual-step figcaption{display:block}.distributed-visual-step figcaption span{display:block;margin-bottom:4px}}
+    `;
+    document.head.appendChild(style);
+  };
+
   const init = () => {
     const article = document.querySelector('article.content, article.main, article');
     if (!article) return;
+
+    // Add the actual process photos first. These pages may not use the newer
+    // tutorial shell/header classes, so image insertion must not depend on them.
+    addStyles();
+    if (location.pathname.includes('crochet-bucket-hat')) addBucketHatSteps(article);
+    else addVisualSteps(article);
 
     const shell = document.querySelector('.tutorial-shell');
     const header = document.querySelector('.tutorial-header');
     const hero = document.querySelector('.hero');
     const facts = document.querySelector('.facts');
-    if (!shell || !header) return;
 
     const headings = [...article.querySelectorAll('h2')];
     headings.forEach((heading, index) => {
       if (!heading.id) heading.id = `section-${index + 1}`;
     });
 
-    if (headings.length >= 3 && !document.querySelector('.tutorial-jumpbar')) {
+    if (header && headings.length >= 3 && !document.querySelector('.tutorial-jumpbar')) {
       const jumpbar = document.createElement('nav');
       jumpbar.className = 'tutorial-jumpbar';
       jumpbar.setAttribute('aria-label', 'Tutorial sections');
@@ -199,9 +219,6 @@
       hero.insertAdjacentElement('afterend', save);
     }
 
-    if (location.pathname.includes('crochet-bucket-hat')) addBucketHatSteps(article);
-    else addVisualSteps(article);
-
     if (!document.querySelector('.tutorial-backtop')) {
       const back = document.createElement('a');
       back.className = 'tutorial-backtop';
@@ -215,20 +232,6 @@
       if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
       if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
     });
-
-    if (!document.querySelector('#distributed-visual-step-style')) {
-      const style = document.createElement('style');
-      style.id = 'distributed-visual-step-style';
-      style.textContent = `
-        .distributed-visual-step{margin:38px 0 48px;padding:0;background:transparent}
-        .distributed-visual-step img{display:block;width:100%;max-width:760px;height:auto;max-height:620px;object-fit:cover;border-radius:18px;box-shadow:0 14px 38px rgba(38,53,47,.13);margin:0 auto}
-        .distributed-visual-step figcaption{display:flex;align-items:baseline;gap:12px;max-width:760px;margin:12px auto 0;padding:0 4px;color:#68736d;font-family:Arial,sans-serif;font-size:.88rem}
-        .distributed-visual-step figcaption span{color:#45695a;text-transform:uppercase;letter-spacing:.1em;font-size:.68rem;font-weight:700;white-space:nowrap}
-        .distributed-visual-step figcaption strong{font-family:Georgia,"Times New Roman",serif;color:#26352f;font-size:1.05rem;font-weight:600}
-        @media(max-width:760px){.distributed-visual-step{margin:30px 0 40px}.distributed-visual-step img{border-radius:14px}.distributed-visual-step figcaption{display:block}.distributed-visual-step figcaption span{display:block;margin-bottom:4px}}
-      `;
-      document.head.appendChild(style);
-    }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
