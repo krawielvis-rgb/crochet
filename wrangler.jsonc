@@ -1,6 +1,6 @@
 {
   "name": "crochet",
-  "main": "src/worker-with-tutorial-images.js",
+  "main": "src/tutorial-image-wrapper.js",
   "compatibility_date": "2026-09-15",
   "assets": {
     "directory": "./dist",
