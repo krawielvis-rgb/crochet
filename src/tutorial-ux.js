@@ -62,7 +62,7 @@
     const figure = document.createElement('figure');
     figure.className = 'distributed-visual-step';
     figure.innerHTML = `
-      <img src="/tutorial/${folder}/${filename}"
+      <img src="/images/tutorials/${folder}/${filename}"
            alt="${escapeHtml(title)} for this crochet tutorial"
            loading="lazy" decoding="async">
       <figcaption><span>Step ${index + 1}</span><strong>${escapeHtml(title)}</strong></figcaption>
