@@ -62,7 +62,7 @@ const tutorialEnhancer = {
     const slug = path.split('/posts/')[1]?.replace(/\.html$/, '') || ''
     const info = seo[slug]
     if (!info) return html
-    const enhancer = '<script type="module" src="/src/tutorial-enhancements.js?v=3"></script><script type="module" src="/src/deep-tutorials.js?v=3"></script>'
+    const enhancer = '<script type="module" src="/src/tutorial-enhancements.js?v=3"></script><script type="module" src="/src/deep-tutorials.js?v=3"></script><script type="module" src="/src/tutorial-ux.js?v=1"></script>'
     const image = `/images/pins/pin-${slug}.jpg`
     const url = `${site}/posts/${slug}.html`
     const relatedLinks = info.related.map(r => `<a href="/posts/${r}.html">${labels[r] || r}</a>`).join('')
@@ -87,7 +87,7 @@ const cohesiveTutorialPlugin = {
       .replace(/<section class="related-tutorials"[\s\S]*?<\/section>/gi, '')
       .replace(/<style>\.related-tutorials\{[\s\S]*?<\/style>/gi, '')
       .replace(/class="pattern-card"/gi, 'class="tutorial-continuation"')
-      .replace('</head>', '<style>.tutorial-continuation{margin:48px 0 0;padding:0;border:0;background:transparent}.tutorial-continuation h2{margin-top:48px}.tutorial-continuation h3{margin-top:34px}.tutorial-continuation p{margin-bottom:22px}.tutorial-continuation ol,.tutorial-continuation ul{margin-bottom:28px}</style></head>')
+      .replace('</head>', '<style>.tutorial-continuation{margin:48px 0 0;padding:0;border:0;background:transparent}.tutorial-continuation h2{margin-top:48px}.tutorial-continuation h3{margin-top:34px}.tutorial-continuation p{margin-bottom:22px}.tutorial-continuation ol,.tutorial-continuation ul{margin-bottom:28px}.tutorial-jumpbar{position:sticky;top:0;z-index:10;display:flex;gap:8px;flex-wrap:wrap;margin:0 0 26px;padding:10px 0;background:rgba(248,245,238,.96);backdrop-filter:blur(8px);border-bottom:1px solid rgba(38,53,47,.1)}.tutorial-jumpbar a{padding:7px 11px;border:1px solid rgba(38,53,47,.14);border-radius:999px;background:#fffdf9;color:#26352f;text-decoration:none;font:600 12px/1 Arial,sans-serif}.tutorial-jumpbar a:hover{background:#f1ebe1}.quick-pattern{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 28px;padding:22px 24px;border:1px solid #e7e1d7;border-radius:18px;background:#fffdf9;box-shadow:0 8px 28px rgba(38,53,47,.05)}.quick-pattern>div span{display:block;margin-bottom:5px;color:#8b6f55;font:700 10px/1.2 Arial,sans-serif;letter-spacing:.14em}.quick-pattern>div strong{font:700 18px/1.25 Georgia,serif}.quick-pattern dl{display:flex;gap:18px;margin:0}.quick-pattern dl div{min-width:78px}.quick-pattern dt{color:#66736d;font:700 10px/1.2 Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em}.quick-pattern dd{margin:4px 0 0;font:15px/1.3 Georgia,serif}.quick-pattern>a{white-space:nowrap;color:#26352f;font:700 13px/1 Arial,sans-serif}.save-pattern{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 36px;padding:18px 20px;border-radius:16px;background:#f1ebe1;border:1px solid #e7e1d7}.save-pattern strong,.save-pattern span{display:block}.save-pattern strong{font:700 17px/1.3 Georgia,serif}.save-pattern span{margin-top:3px;color:#66736d;font:14px/1.5 Arial,sans-serif}.save-pattern button{border:0;border-radius:999px;padding:11px 16px;background:#26352f;color:#fffdf9;cursor:pointer;font:700 13px/1 Arial,sans-serif}.save-pattern button:hover{opacity:.9}.tutorial-backtop{display:block;width:max-content;margin:36px 0 0;color:#66736d;font:600 13px/1 Arial,sans-serif;text-decoration:none}.tutorial-backtop:hover{text-decoration:underline}@media(max-width:700px){.tutorial-jumpbar{overflow-x:auto;flex-wrap:nowrap}.quick-pattern{display:block}.quick-pattern dl{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:18px 0}.quick-pattern>a{display:inline-block}.save-pattern{display:block}.save-pattern button{margin-top:14px;width:100%}}</style></head>')
   }
 }
 
@@ -98,7 +98,8 @@ const homepagePencilBagPlugin = {
     if (!(path === '/' || path.endsWith('/index.html'))) return html
     const card = `<a class="pinterest-card" href="/posts/crochet-pencil-bag.html"><img src="/images/pins/pin-crochet-pencil-bag.jpg" alt="Crochet Pencil Bag" loading="lazy"><div class="pinterest-card-content"><h3>Crochet Pencil Bag</h3><span>Read tutorial →</span></div></a>`
     if (html.includes('href="/posts/crochet-pencil-bag.html"')) return html
-    return html.replace(/(<a class="pinterest-card" href="\/posts\/sunflower-granny-square\.html">[\s\S]*?<\/a>)/, `$1\n      ${card}`)
+    return html.replace(/(<a class="pinterest-card" href="\/posts\/sunflower-granny-square\.html">[\s\S]*?<\/a>)/, `$1\
+      ${card}`)
   }
 }
 
