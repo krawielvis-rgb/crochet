@@ -58,6 +58,78 @@
     }
   };
 
+  const makeFigure = (folder, filename, title, index) => {
+    const figure = document.createElement('figure');
+    figure.className = 'distributed-visual-step';
+    figure.innerHTML = `
+      <img src="/images/tutorials/${folder}/${filename}"
+           alt="${escapeHtml(title)} for this crochet tutorial"
+           loading="lazy" decoding="async">
+      <figcaption><span>Step ${index + 1}</span><strong>${escapeHtml(title)}</strong></figcaption>
+    `;
+    return figure;
+  };
+
+  const addBucketHatSteps = (article) => {
+    if (article.querySelector('.bucket-hat-distributed')) return;
+
+    const oldHeading = [...article.querySelectorAll('h2')].find(h => /visual step-by-step/i.test(h.textContent));
+    if (oldHeading) {
+      const oldText = oldHeading.nextElementSibling;
+      const oldContainer = oldText?.nextElementSibling;
+      oldHeading.remove();
+      if (oldText?.tagName === 'P') oldText.remove();
+      if (oldContainer?.classList.contains('visual-steps')) oldContainer.remove();
+    }
+
+    const stepHeadings = [...article.querySelectorAll('h3')]
+      .filter(h => /^step\s*[1-8]\b/i.test(h.textContent.trim()))
+      .slice(0, 8);
+
+    const steps = [
+      ['01-materials.jpg', 'Materials & Preparation'],
+      ['02-starting-crown.jpg', 'Starting the Crown'],
+      ['03-crown-increases.jpg', 'Building the Circular Crown'],
+      ['04-completed-crown.jpg', 'Completed Crown'],
+      ['05-side-walls.jpg', 'Building the Side Walls'],
+      ['06-brim-increases.jpg', 'Brim Increases'],
+      ['07-finishing-brim.jpg', 'Finishing the Brim'],
+      ['08-finished-bucket-hat.jpg', 'Finished Bucket Hat']
+    ];
+
+    // Keep the first materials photo near the preparation content, then place
+    // each construction photo immediately after its corresponding step content.
+    const materialsHeading = [...article.querySelectorAll('h2')].find(h => /materials.*preparation/i.test(h.textContent));
+    if (materialsHeading) {
+      const figure = makeFigure('bucket-hat', steps[0][0], steps[0][1], 0);
+      let anchor = materialsHeading;
+      let next = anchor.nextElementSibling;
+      while (next && next.tagName !== 'H2') {
+        anchor = next;
+        next = next.nextElementSibling;
+      }
+      anchor.insertAdjacentElement('afterend', figure);
+    }
+
+    stepHeadings.forEach((heading, i) => {
+      const step = steps[i + 1];
+      if (!step) return;
+      const figure = makeFigure('bucket-hat', step[0], step[1], i + 1);
+      let anchor = heading;
+      let next = anchor.nextElementSibling;
+      // Put the image after the explanatory content/checkpoint, not before it.
+      if (next && !/^H[23]$/.test(next.tagName)) {
+        anchor = next;
+        next = next.nextElementSibling;
+        if (next && next.classList.contains('pattern-box')) anchor = next;
+        else if (next && next.classList.contains('checkpoint')) anchor = next;
+      }
+      anchor.insertAdjacentElement('afterend', figure);
+    });
+
+    article.classList.add('bucket-hat-distributed');
+  };
+
   const addVisualSteps = (article) => {
     const key = Object.keys(visualTutorials).find((slug) => location.pathname.includes(slug));
     if (!key || article.querySelector('.distributed-visual-step')) return;
@@ -65,7 +137,6 @@
     const config = visualTutorials[key];
     const headings = [...article.querySelectorAll('h2')];
     const used = new Set();
-    const insertions = [];
 
     config.steps.forEach(([filename, title, pattern], index) => {
       let heading = headings.find((h) => !used.has(h) && pattern.test(h.textContent));
@@ -77,18 +148,8 @@
       used.add(heading);
 
       const section = heading.closest('section') || heading;
-      const figure = document.createElement('figure');
-      figure.className = 'distributed-visual-step';
-      figure.innerHTML = `
-        <img src="/images/tutorials/${config.folder}/${filename}"
-             alt="${escapeHtml(title)} for this crochet tutorial"
-             loading="lazy" decoding="async">
-        <figcaption><span>Step ${index + 1}</span><strong>${escapeHtml(title)}</strong></figcaption>
-      `;
-      insertions.push([section, figure]);
+      section.insertAdjacentElement('afterend', makeFigure(config.folder, filename, title, index));
     });
-
-    insertions.forEach(([section, figure]) => section.insertAdjacentElement('afterend', figure));
   };
 
   const init = () => {
@@ -141,7 +202,8 @@
       hero.insertAdjacentElement('afterend', save);
     }
 
-    addVisualSteps(article);
+    if (location.pathname.includes('crochet-bucket-hat')) addBucketHatSteps(article);
+    else addVisualSteps(article);
 
     if (!document.querySelector('.tutorial-backtop')) {
       const back = document.createElement('a');
