@@ -1,0 +1,121 @@
+name: Standardize tutorial headers
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Normalize existing tutorial headers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          skip = {'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet.html'}
+          css = '''<style id="sara-rain-header-style">
+          .tutorial-header,.tutorial-hero,.article-hero{background:#eee8dc!important;padding:42px!important;border-radius:24px!important;margin:20px 0 34px!important;text-align:left!important}
+          .tutorial-header .brand,.tutorial-hero .eyebrow,.article-hero .meta{display:block!important;color:#6a8278!important;font:700 .75rem Arial,sans-serif!important;text-transform:uppercase!important;letter-spacing:.12em!important;margin:0 0 14px!important;text-decoration:none!important}
+          .tutorial-header h1,.tutorial-hero h1,.article-hero h1{font-size:clamp(2.5rem,6vw,4.5rem)!important;line-height:1.03!important;margin:14px 0 20px!important;font-weight:500!important;letter-spacing:-.03em!important}
+          .tutorial-header .intro,.tutorial-hero .lede,.article-hero .dek{font-size:1.2rem!important;line-height:1.55!important;max-width:760px!important;color:#53655f!important;margin:0!important}
+          .tutorial-hero .hero-image,.article-hero .hero-image,.article-hero img{width:100%!important;max-height:720px!important;object-fit:cover!important;border-radius:18px!important;margin:28px 0 0!important;display:block!important}
+          .tutorial-header + .hero-image{width:100%!important;max-height:720px!important;object-fit:cover!important;border-radius:18px!important;margin:28px 0 34px!important;display:block!important}
+          @media(max-width:700px){.tutorial-header,.tutorial-hero,.article-hero{padding:28px 22px!important}.tutorial-header h1,.tutorial-hero h1,.article-hero h1{font-size:2.7rem!important}}
+          </style>'''
+
+          def text(x):
+              return re.sub(r'<[^>]+>', ' ', x or '').replace('&amp;','&').replace('&quot;','"').replace('&#39;',"'").replace('&lt;','<').replace('&gt;','>').strip()
+
+          def normalize(s):
+              if 'id="sara-rain-header-style"' not in s:
+                  s = s.replace('</head>', css + '\n</head>', 1)
+
+              m = re.search(r'<header class="tutorial-header">([\\s\\S]*?)</header>', s, re.I)
+              if m:
+                  inner=m.group(1)
+                  hm=re.search(r'<h1[^>]*>([\\s\\S]*?)</h1>',inner,re.I)
+                  dm=re.search(r'<p class="intro"[^>]*>([\\s\\S]*?)</p>',inner,re.I)
+                  title=text(hm.group(1)) if hm else 'Crochet Tutorial'
+                  desc=text(dm.group(1)) if dm else title
+                  s=s[:m.start()] + f'<div class="tutorial-hero"><div class="eyebrow">Sara Rain Crochet · Free Pattern</div><h1>{title}</h1><p class="lede">{desc}</p></div>' + s[m.end():]
+
+              m = re.search(r'(<div class="tutorial-hero">[\\s\\S]*?</div>)\\s*(<img\\b[^>]*class="hero-image"[^>]*>)', s, re.I)
+              if m and 'hero-image' not in m.group(1):
+                  hero=m.group(1).replace('</div>', '\\n'+m.group(2)+'\\n</div>', 1)
+                  s=s[:m.start()] + hero + s[m.end():]
+
+              m = re.search(r'<div class="hero">([\\s\\S]*?)</div>\\s*<div class="facts">', s, re.I)
+              if m and '<div class="kicker">' in m.group(1):
+                  inner=m.group(1)
+                  hm=re.search(r'<h1[^>]*>([\\s\\S]*?)</h1>',inner,re.I)
+                  dm=re.search(r'<p class="lede"[^>]*>([\\s\\S]*?)</p>',inner,re.I)
+                  im=re.search(r'<img\\b[^>]*src="([^"]+)"[^>]*>',inner,re.I)
+                  title=text(hm.group(1)) if hm else 'Crochet Tutorial'
+                  desc=text(dm.group(1)) if dm else title
+                  img=im.group(0) if im else ''
+                  repl=f'<div class="tutorial-hero"><div class="eyebrow">Sara Rain Crochet · Free Pattern</div><h1>{title}</h1><p class="lede">{desc}</p>{img}</div>\\n<div class="facts">'
+                  s=s[:m.start()] + repl + s[m.end():]
+
+              m = re.search(r'<p class="meta">[\\s\\S]*?</p>\\s*<h1>([\\s\\S]*?)</h1>\\s*<p class="dek">([\\s\\S]*?)</p>\\s*(<img\\b[^>]*>)', s, re.I)
+              if m:
+                  title=text(m.group(1)); desc=text(m.group(2)); img=m.group(3)
+                  repl=f'<div class="article-hero"><div class="meta">Sara Rain Crochet · Free Pattern</div><h1>{title}</h1><p class="dek">{desc}</p>{img}</div>'
+                  s=s[:m.start()] + repl + s[m.end():]
+              return s
+
+          changed=0
+          for root in (Path('posts'), Path('public/posts')):
+              if not root.exists(): continue
+              for p in root.glob('*.html'):
+                  if p.name in skip: continue
+                  old=p.read_text()
+                  new=normalize(old)
+                  if new != old:
+                      p.write_text(new)
+                      changed += 1
+          print(f'Normalized {changed} tutorial page(s).')
+          PY
+
+      - name: Make Quick Publisher use the same header style
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/worker-v2.js')
+          s=p.read_text()
+          marker='function addMissingMeta(html,title,description,url,image){'
+          if 'function normalizeTutorialHeader(html,title,description){' not in s:
+              fn='''function normalizeTutorialHeader(html,title,description){\n  const eyebrow='<div class="eyebrow">Sara Rain Crochet · Free Pattern</div>';\n  const lede=`<p class="lede">${esc(description)}</p>`;\n  let h=html;\n  h=h.replace(/<p\\b[^>]*class=["']meta["'][^>]*>[\\s\\S]*?<\\/p>/i,eyebrow);\n  h=h.replace(/<p\\b[^>]*class=["']intro["'][^>]*>[\\s\\S]*?<\\/p>/i,lede);\n  h=h.replace(/<p\\b[^>]*class=["']dek["'][^>]*>[\\s\\S]*?<\\/p>/i,lede);\n  if(!/<div\\b[^>]*class=["'][^"']*eyebrow[^"']*["']/i.test(h)) h=h.replace(/(<h1\\b[^>]*>[\\s\\S]*?<\\/h1>)/i,`${eyebrow}$1`);\n  if(!/<p\\b[^>]*class=["']lede["']/i.test(h)) h=h.replace(/(<h1\\b[^>]*>[\\s\\S]*?<\\/h1>)/i,`$1${lede}`);\n  return h;\n}\n\n'''
+              s=s.replace(marker,fn+marker,1)
+          old='  html=addMissingMeta(html,title,description,url,image);'
+          new='  html=addMissingMeta(html,title,description,url,image);\n  html=normalizeTutorialHeader(html,title,description);'
+          if old in s and new not in s:
+              s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add posts public/posts src/worker-v2.js
+          if git diff --cached --quiet; then
+            echo "No changes needed."
+            exit 0
+          fi
+          git commit -m "Standardize tutorial headers to baby blanket style"
+          git push
+
+      - name: Remove this one-time workflow
+        if: success()
+        run: |
+          git rm .github/workflows/normalize-tutorial-headers.yml
+          git commit -m "Remove one-time tutorial header workflow"
+          git push
