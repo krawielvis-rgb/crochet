@@ -18,8 +18,8 @@ async function auth(r,e){const t=cookie(r,'sara_admin'),[p,s]=t.split('.');if(!p
 const gh=e=>({Authorization:`Bearer ${e.GITHUB_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'Sara-Rain-Crochet-Admin','Content-Type':'application/json'});
 async function g(url,e,opt={}){const r=await fetch(url,{...opt,headers:{...gh(e),...(opt.headers||{})}});if(!r.ok){let msg='GitHub API '+r.status;try{const d=await r.json();if(d.message)msg+=': '+d.message}catch{}throw Error(msg)}return r.json()}
 
-const esc=x=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const cleanText=x=>String(x||'').replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
+const esc=x=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
+const cleanText=x=>String(x||'').replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'\"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
 const paras=x=>String(x||'').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean).map(s=>`<p>${esc(s).replace(/\n/g,'<br>')}</p>`).join('');
 const lis=x=>Array.isArray(x)?x.map(s=>`<li>${esc(s)}</li>`).join(''):String(x||'').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>`<li>${esc(s)}</li>`).join('');
 const slug=x=>String(x).toLowerCase().trim().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
@@ -113,7 +113,13 @@ export default{async fetch(r,e){
     const a=await e.ASSETS.fetch(r);if(!a.ok)return a;
     const ps=await posts(e);if(!ps.length)return a;let h=await a.text();
     const cards=ps.map(p=>`<a class="pinterest-card" href="/posts/${p.slug}.html"><img src="${p.image}" alt="${esc(p.title)}" loading="lazy"><div class="pinterest-card-content"><h3>${esc(p.title)}</h3><span>Read tutorial →</span></div></a>`).join('');
-    return new Response(h.replace('</div></div></section>',`${cards}</div></div></section>`),{headers:new Headers(a.headers)})
+    const sectionStart=h.indexOf('<section class="pinterest-section"');
+    const gridStart=sectionStart>=0?h.indexOf('<div class="pinterest-grid">',sectionStart):-1;
+    const gridEnd=gridStart>=0?h.indexOf('</div></div></section>',gridStart):-1;
+    if(gridStart>=0&&gridEnd>=0){
+      h=h.slice(0,gridStart)+`<div class="pinterest-grid">${cards}</div>`+h.slice(gridEnd+'</div>'.length);
+    }
+    return new Response(h,{headers:new Headers({...Object.fromEntries(a.headers),'cache-control':'no-store'})})
   }
   if(u.pathname.startsWith('/posts/')){
     const sl=u.pathname.split('/').pop().replace(/\.html$/,'');const p=(await posts(e)).find(x=>x.slug===sl);
