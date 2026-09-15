@@ -1,0 +1,62 @@
+name: Rename bookmark tutorial title
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/rename-bookmark-title.yml
+
+permissions:
+  contents: write
+
+jobs:
+  rename:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update bookmark title everywhere
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          old = 'Crochet Bookmark Tutorial | Sara Rain Crochet'
+          new = 'Crochet Bookmark Tutorial'
+
+          data_path = Path('data/posts.json')
+          data = json.loads(data_path.read_text())
+          changed = False
+          for post in data:
+              if post.get('slug') == 'crochet-bookmark-tutorial-sara-rain-crochet' and post.get('title') == old:
+                  post['title'] = new
+                  changed = True
+          if changed:
+              data_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
+
+          index = Path('index.html')
+          text = index.read_text()
+          if old in text:
+              text = text.replace(old, new)
+              index.write_text(text)
+              changed = True
+
+          if not changed:
+              print('No bookmark title changes needed.')
+          else:
+              print('Bookmark title updated.')
+          PY
+
+      - name: Remove one-time workflow
+        run: rm -f .github/workflows/rename-bookmark-title.yml
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/posts.json index.html .github/workflows/rename-bookmark-title.yml
+          git commit -m "Rename crochet bookmark tutorial"
+          git push
