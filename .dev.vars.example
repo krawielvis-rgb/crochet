@@ -1,0 +1,6 @@
+# Local Cloudflare Worker secrets (copy to .dev.vars, never commit .dev.vars)
+ADMIN_USERNAME=saraadmin
+ADMIN_EMAIL=sara.business.rain@gmail.com
+ADMIN_PASSWORD=CHANGE_THIS_LOCAL_PASSWORD
+SESSION_SECRET=CHANGE_THIS_TO_A_LONG_RANDOM_SECRET
+GITHUB_TOKEN=YOUR_GITHUB_TOKEN
