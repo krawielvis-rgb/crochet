@@ -37,6 +37,18 @@ function replacePinImage(html,image,title){
   if(/<body\b[^>]*>/i.test(html))return html.replace(/<body\b[^>]*>/i,m=>m+tag);
   return tag+html;
 }
+function normalizeTutorialHeader(html,title,description){
+  const eyebrow='<div class="eyebrow">Sara Rain Crochet · Free Pattern</div>';
+  const lede=`<p class="lede">${esc(description)}</p>`;
+  let h=html;
+  h=h.replace(/<p\b[^>]*class=["']meta["'][^>]*>[\s\S]*?<\/p>/i,eyebrow);
+  h=h.replace(/<p\b[^>]*class=["']intro["'][^>]*>[\s\S]*?<\/p>/i,lede);
+  h=h.replace(/<p\b[^>]*class=["']dek["'][^>]*>[\s\S]*?<\/p>/i,lede);
+  if(!/<div\b[^>]*class=["'][^"']*eyebrow[^"']*["']/i.test(h)) h=h.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i,`${eyebrow}$1`);
+  if(!/<p\b[^>]*class=["']lede["']/i.test(h)) h=h.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i,`$1${lede}`);
+  return h;
+}
+
 function addMissingMeta(html,title,description,url,image){
   let h=html;
   if(!/<title\b/i.test(h))h=h.replace(/<head\b[^>]*>/i,m=>m+`<title>${esc(title)} — Sara Rain Crochet</title>`);
@@ -68,6 +80,7 @@ async function publishHtml(r,e){
   const url=`https://crochet.krawielvis.workers.dev/posts/${s}.html`;
   html=replacePinImage(html,image,title);
   html=addMissingMeta(html,title,description,url,image);
+  html=normalizeTutorialHeader(html,title,description);
   const ref=await g(`${API}/git/ref/heads/${BRANCH}`,e);
   const head=ref.object.sha;
   const commit=await g(`${API}/git/commits/${head}`,e);
