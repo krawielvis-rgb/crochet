@@ -42,9 +42,18 @@ jobs:
               image = str(post.get('image') or '').strip()
               if not slug or not title or not image:
                   continue
+
+              # Never create a homepage card until its actual image exists.
+              if image.startswith('/'):
+                  local_image = Path('public') / image.lstrip('/')
+                  if not local_image.is_file():
+                      print(f'Skipping {slug}: image missing at {local_image}')
+                      continue
+
               href = f'/posts/{slug}.html'
               if href in text:
                   continue
+
               additions.append(
                   f'      <a class="pinterest-card" href="{html.escape(href, quote=True)}">'
                   f'<img src="{html.escape(image, quote=True)}" alt="{html.escape(title, quote=True)}" loading="lazy">'
@@ -53,7 +62,7 @@ jobs:
               )
 
           if not additions:
-              print('Homepage already contains every published tutorial.')
+              print('No new tutorials with valid images to add.')
               raise SystemExit(0)
 
           text = text[:start + len(marker)] + '\n' + ''.join(additions) + text[start + len(marker):]
