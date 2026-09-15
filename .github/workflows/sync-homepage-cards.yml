@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - data/posts.json
+      - data/sync-trigger.txt
       - .github/workflows/sync-homepage-cards.yml
 
 permissions:
@@ -25,19 +26,15 @@ jobs:
           import json
           from pathlib import Path
           import html
-          import re
 
           data = json.loads(Path('data/posts.json').read_text())
           index = Path('index.html')
           text = index.read_text()
-
           marker = '<div class="pinterest-grid">'
           start = text.find(marker)
           if start == -1:
               raise SystemExit('Pinterest grid not found in index.html')
 
-          # Only add cards that are not already present. Existing hand-curated
-          # cards keep their current order and markup.
           additions = []
           for post in data:
               slug = str(post.get('slug') or '').strip()
@@ -48,14 +45,10 @@ jobs:
               href = f'/posts/{slug}.html'
               if href in text:
                   continue
-              alt = html.escape(title, quote=True)
-              href_e = html.escape(href, quote=True)
-              image_e = html.escape(image, quote=True)
-              title_e = html.escape(title)
               additions.append(
-                  f'      <a class="pinterest-card" href="{href_e}">'
-                  f'<img src="{image_e}" alt="{alt}" loading="lazy">'
-                  f'<div class="pinterest-card-content"><h3>{title_e}</h3>'
+                  f'      <a class="pinterest-card" href="{html.escape(href, quote=True)}">'
+                  f'<img src="{html.escape(image, quote=True)}" alt="{html.escape(title, quote=True)}" loading="lazy">'
+                  f'<div class="pinterest-card-content"><h3>{html.escape(title)}</h3>'
                   f'<span>Read tutorial →</span></div></a>\n'
               )
 
@@ -63,8 +56,6 @@ jobs:
               print('Homepage already contains every published tutorial.')
               raise SystemExit(0)
 
-          # Insert new cards immediately after the opening grid tag. This keeps
-          # newly published tutorials visible at the front of the homepage.
           text = text[:start + len(marker)] + '\n' + ''.join(additions) + text[start + len(marker):]
           index.write_text(text)
           print(f'Added {len(additions)} homepage card(s).')
