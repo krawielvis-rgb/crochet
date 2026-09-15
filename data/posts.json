@@ -1,11 +1,11 @@
 [
   {
-    "slug": "crochet-bookmark-tutorial-sara-rain-crochet",
-    "title": "Crochet Bookmark Tutorial",
-    "description": "Learn how to crochet a simple, slim bookmark with an easy row-by-row pattern, beginner-friendly stitches, optional tassel, sizing tips, and finishing instructions.",
+    "slug": "crochet-bucket-hat",
+    "title": "Crochet Bucket Hat",
+    "description": "Learn how to crochet a stylish bucket hat with a simple crown, even sides, and a comfortable brim. A beginner-friendly step-by-step crochet bucket hat tutorial.",
     "category": "Crochet tutorial",
     "readTime": "12 min read",
-    "image": "/images/pins/pin-crochet-bookmark-tutorial-sara-rain-crochet.jpg",
+    "image": "/images/pins/pin-crochet-bucket-hat.jpg",
     "published": true
   },
   {
@@ -92,27 +92,6 @@
     "finishing": "Weave in the working end, trim the tassel evenly, and block the piece flat if the yarn permits.",
     "variations": "Try a contrast tassel, a tiny flower at the end, or a longer version for journals.",
     "care": "Keep it dry and wash gently if the fiber allows. Store it flat inside a favorite book."
-  },
-  {
-    "slug": "crochet-bucket-hat",
-    "title": "Crochet Bucket Hat",
-    "description": "A beginner bucket hat with a rounded crown, straight side depth, widening brim, and optional structured edge.",
-    "category": "Wearables",
-    "readTime": "16 min read",
-    "image": "/images/pins/pin-crochet-bucket-hat.jpg",
-    "published": true,
-    "materials": "Bulky cotton yarn, 5.5 mm hook, stitch markers, measuring tape",
-    "intro": "Cotton is useful for a bucket hat because it gives the fabric enough structure to hold the brim. Measure the head circumference before starting.",
-    "steps": [
-      "Crochet the crown in rounds, increasing evenly until it matches the top-of-head measurement.",
-      "Work the side section without increases, then widen the brim over several rounds.",
-      "Finish with a final edge that stabilizes the shape."
-    ],
-    "checkpoint": "Check crown width before adding depth. Try the hat on after the side section and again halfway through the brim.",
-    "troubleshooting": "A wavy brim usually means increases were added too quickly. A brim that curls upward needs more width or a different hook. If the crown cups too sharply, spread increases across more rounds.",
-    "finishing": "Weave in ends and steam or lightly shape only if the cotton care instructions permit it. A firm final round can help the brim keep its line.",
-    "variations": "Add stripes, a contrast brim, a tiny flower, or a simple embroidered initial.",
-    "care": "Spot clean or wash according to the yarn label. Dry flat or reshape over a bowl if recommended."
   },
   {
     "slug": "crochet-cardigan",
@@ -525,6 +504,15 @@
     "category": "Crochet tutorial",
     "readTime": "12 min read",
     "image": "/images/pins/pin-easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-bookmark-tutorial-sara-rain-crochet",
+    "title": "Crochet Bookmark Tutorial",
+    "description": "Learn how to crochet a simple, slim bookmark with an easy row-by-row pattern, beginner-friendly stitches, optional tassel, sizing tips, and finishing instructions.",
+    "category": "Crochet tutorial",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-crochet-bookmark-tutorial-sara-rain-crochet.jpg",
     "published": true
   },
   {
