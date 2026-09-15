@@ -62,7 +62,7 @@
     const figure = document.createElement('figure');
     figure.className = 'distributed-visual-step';
     figure.innerHTML = `
-      <img src="/images/tutorials/${folder}/${filename}"
+      <img src="/tutorial/${folder}/${filename}"
            alt="${escapeHtml(title)} for this crochet tutorial"
            loading="lazy" decoding="async">
       <figcaption><span>Step ${index + 1}</span><strong>${escapeHtml(title)}</strong></figcaption>
@@ -97,8 +97,6 @@
       ['08-finished-bucket-hat.jpg', 'Finished Bucket Hat']
     ];
 
-    // Keep the first materials photo near the preparation content, then place
-    // each construction photo immediately after its corresponding step content.
     const materialsHeading = [...article.querySelectorAll('h2')].find(h => /materials.*preparation/i.test(h.textContent));
     if (materialsHeading) {
       const figure = makeFigure('bucket-hat', steps[0][0], steps[0][1], 0);
@@ -117,7 +115,6 @@
       const figure = makeFigure('bucket-hat', step[0], step[1], i + 1);
       let anchor = heading;
       let next = anchor.nextElementSibling;
-      // Put the image after the explanatory content/checkpoint, not before it.
       if (next && !/^H[23]$/.test(next.tagName)) {
         anchor = next;
         next = next.nextElementSibling;
