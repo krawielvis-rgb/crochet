@@ -1,0 +1,34 @@
+name: Fix baby booties homepage card
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-baby-booties-card.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update card title
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = 'Easy Crochet Baby Booties Pattern for Beginners | Sara Rain Crochet'
+          s = s.replace(old, 'Easy Crochet Baby Booties')
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit change and remove workflow
+        run: |
+          rm .github/workflows/fix-baby-booties-card.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/fix-baby-booties-card.yml
+          git diff --cached --quiet && exit 0
+          git commit -m 'Fix baby booties homepage card title'
+          git push
