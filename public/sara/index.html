@@ -176,7 +176,7 @@ async function api(path, opt = {}) {
     headers: { 'content-type': 'application/json', ...(opt.headers || {}) }
   });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw Error(d.error || `Request failed (${r.status})`);
+  if (!r.ok) throw Error(d.error || ('Request failed (' + r.status + ')'));
   return d;
 }
 
@@ -189,7 +189,11 @@ function statusEl(id, text, type = '') {
 }
 
 function escapeHtml(s) {
-  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+  return String(s || '')
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"');
 }
 
 function pinUrl(p) {
@@ -199,24 +203,24 @@ function pinUrl(p) {
 }
 
 function showLogin() {
-  document.getElementById('app').innerHTML = `
-    <div class="panel login">
-      <div class="kicker">Sara Rain Crochet · Private</div>
-      <h1>Admin login</h1>
-      <p class="muted">Sign in with the admin username or email and password.</p>
-      <form id="loginForm">
-        <div class="field">
-          <label>Username or email</label>
-          <input id="identifier" autocomplete="username" required>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input id="password" type="password" autocomplete="current-password" required>
-        </div>
-        <button class="btn btn-primary" style="width:100%">Sign in</button>
-        <div id="loginStatus" class="status hidden"></div>
-      </form>
-    </div>`;
+  document.getElementById('app').innerHTML =
+    '<div class="panel login">' +
+      '<div class="kicker">Sara Rain Crochet · Private</div>' +
+      '<h1>Admin login</h1>' +
+      '<p class="muted">Sign in with the admin username or email and password.</p>' +
+      '<form id="loginForm">' +
+        '<div class="field">' +
+          '<label>Username or email</label>' +
+          '<input id="identifier" autocomplete="username" required>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label>Password</label>' +
+          '<input id="password" type="password" autocomplete="current-password" required>' +
+        '</div>' +
+        '<button class="btn btn-primary" style="width:100%">Sign in</button>' +
+        '<div id="loginStatus" class="status hidden"></div>' +
+      '</form>' +
+    '</div>';
 
   document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
@@ -239,53 +243,46 @@ function showLogin() {
 }
 
 function showDashboard() {
-  document.getElementById('app').innerHTML = `
-    <div class="top">
-      <div class="brand"><span class="brand-mark">S</span><span>Sara Rain · Admin</span></div>
-      <button class="btn" id="logout">Log out</button>
-    </div>
-
-    <div class="tabs">
-      <button type="button" class="tab active" data-tab="publish">Publish</button>
-      <button type="button" class="tab" data-tab="manage">Manage pins</button>
-    </div>
-
-    <div id="tab-publish">
-      <div class="panel">
-        <div class="kicker">Quick publish</div>
-        <h1>Publish a tutorial</h1>
-        <p class="muted">Upload the Pinterest pin and paste your finished HTML. Title, description, and URL are detected automatically.</p>
-
-        <form id="postForm">
-          <div class="upload field">
-            <label>1 · Pinterest pin</label>
-            <input id="image" type="file" accept="image/jpeg,image/png,image/webp" required>
-            <p class="hint">JPG, PNG, or WebP · max ~4 MB</p>
-            <img id="preview" class="preview" alt="Preview">
-          </div>
-
-          <div class="field">
-            <label>2 · Tutorial HTML</label>
-            <textarea id="html" required placeholder="Paste the complete HTML tutorial here..."></textarea>
-            <p class="hint">Needs a <title> or <h1>. The first image is replaced with your uploaded pin.</p>
-          </div>
-
-          <button id="publishBtn" class="btn btn-primary" type="submit">Publish tutorial</button>
-          <div id="status" class="status hidden"></div>
-        </form>
-      </div>
-    </div>
-
-    <div id="tab-manage" class="hidden">
-      <div class="panel">
-        <div class="kicker">Library</div>
-        <h2>Published pins</h2>
-        <p class="muted">All tutorials currently in the catalog. Delete removes them from the homepage catalog.</p>
-        <div id="postList" class="post-list">Loading…</div>
-        <div id="manageStatus" class="status hidden"></div>
-      </div>
-    </div>
-  `;
+  document.getElementById('app').innerHTML =
+    '<div class="top">' +
+      '<div class="brand"><span class="brand-mark">S</span><span>Sara Rain · Admin</span></div>' +
+      '<button class="btn" id="logout">Log out</button>' +
+    '</div>' +
+    '<div class="tabs">' +
+      '<button type="button" class="tab active" data-tab="publish">Publish</button>' +
+      '<button type="button" class="tab" data-tab="manage">Manage pins</button>' +
+    '</div>' +
+    '<div id="tab-publish">' +
+      '<div class="panel">' +
+        '<div class="kicker">Quick publish</div>' +
+        '<h1>Publish a tutorial</h1>' +
+        '<p class="muted">Upload the Pinterest pin and paste your finished HTML. Title, description, and URL are detected automatically.</p>' +
+        '<form id="postForm">' +
+          '<div class="upload field">' +
+            '<label>1 · Pinterest pin</label>' +
+            '<input id="image" type="file" accept="image/jpeg,image/png,image/webp" required>' +
+            '<p class="hint">JPG, PNG, or WebP · max ~4 MB</p>' +
+            '<img id="preview" class="preview" alt="Preview">' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>2 · Tutorial HTML</label>' +
+            '<textarea id="html" required placeholder="Paste the complete HTML tutorial here..."></textarea>' +
+            '<p class="hint">Needs a title tag or h1. The first image is replaced with your uploaded pin.</p>' +
+          '</div>' +
+          '<button id="publishBtn" class="btn btn-primary" type="submit">Publish tutorial</button>' +
+          '<div id="status" class="status hidden"></div>' +
+        '</form>' +
+      '</div>' +
+    '</div>' +
+    '<div id="tab-manage" class="hidden">' +
+      '<div class="panel">' +
+        '<div class="kicker">Library</div>' +
+        '<h2>Published pins</h2>' +
+        '<p class="muted">All tutorials currently in the catalog. Delete removes them from the homepage catalog.</p>' +
+        '<div id="postList" class="post-list">Loading…</div>' +
+        '<div id="manageStatus" class="status hidden"></div>' +
+      '</div>' +
+    '</div>';
 
   document.getElementById('logout').onclick = async () => {
     await api('/api/admin/logout', { method: 'POST', body: '{}' });
@@ -341,7 +338,7 @@ function showDashboard() {
         const html = document.getElementById('html').value;
         const d = await api('/api/admin/publish-html', {
           method: 'POST',
-          body: JSON.stringify({ html, imageDataUrl: imageData })
+          body: JSON.stringify({ html: html, imageDataUrl: imageData })
         });
         statusEl('status', 'Published! ' + d.url, 'success');
         form.reset();
@@ -369,29 +366,30 @@ async function loadPosts() {
     }
     list.innerHTML = postsCache.map((p) => {
       const img = pinUrl(p);
-      const bg = img ? `style="background-image:url('${String(img).replace(/'/g, '%27')}')"` : '';
+      const bg = img ? ('style="background-image:url(\'' + String(img).replace(/'/g, '%27') + '\')"') : '';
       const slug = escapeHtml(p.slug || '');
       const title = escapeHtml(p.title || p.slug || 'Untitled');
       const cat = escapeHtml(p.category || 'Tutorial');
-      return `
-      <div class="post-item" data-slug="${slug}">
-        <div class="thumb" ${bg}></div>
-        <div>
-          <h3>${title}</h3>
-          <p>${cat} · /posts/${slug}.html</p>
-        </div>
-        <div class="post-actions">
-          <a class="btn" href="/posts/${slug}.html" target="_blank" rel="noopener">View</a>
-          <button type="button" class="btn btn-danger" data-delete="${slug}">Delete</button>
-        </div>
-      </div>`;
+      return (
+        '<div class="post-item" data-slug="' + slug + '">' +
+          '<div class="thumb" ' + bg + '></div>' +
+          '<div>' +
+            '<h3>' + title + '</h3>' +
+            '<p>' + cat + ' · /posts/' + slug + '.html</p>' +
+          '</div>' +
+          '<div class="post-actions">' +
+            '<a class="btn" href="/posts/' + slug + '.html" target="_blank" rel="noopener">View</a>' +
+            '<button type="button" class="btn btn-danger" data-delete="' + slug + '">Delete</button>' +
+          '</div>' +
+        '</div>'
+      );
     }).join('');
 
     list.querySelectorAll('[data-delete]').forEach((btn) => {
       btn.onclick = () => deletePost(btn.getAttribute('data-delete'));
     });
   } catch (err) {
-    list.innerHTML = `<p class="status error">${escapeHtml(err.message)}</p>`;
+    list.innerHTML = '<p class="status error">' + escapeHtml(err.message) + '</p>';
   }
 }
 
@@ -400,7 +398,7 @@ async function deletePost(slug) {
   if (!confirm('Remove “' + slug + '” from the catalog?')) return;
   try {
     statusEl('manageStatus', 'Deleting…');
-    await api('/api/admin/delete', { method: 'POST', body: JSON.stringify({ slug }) });
+    await api('/api/admin/delete', { method: 'POST', body: JSON.stringify({ slug: slug }) });
     statusEl('manageStatus', 'Deleted “' + slug + '”.', 'success');
     loadPosts();
   } catch (err) {
@@ -413,7 +411,7 @@ async function start() {
     const s = await api('/api/admin/session');
     if (s.authenticated) showDashboard();
     else showLogin();
-  } catch {
+  } catch (e) {
     showLogin();
   }
 }
