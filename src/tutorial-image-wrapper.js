@@ -1,5 +1,8 @@
 import baseWorker from './worker-v2.js';
 
+const REMOVED_SLUG = 'crochet-sunglasses-case';
+const REMOVED_HOME_CARDS = /<a class="pinterest-card" href="\/posts\/(?:crochet-sunglasses-case|crochet-sunglasses-case-for-beginners)\.html">[\s\S]*?<\/a>\s*/gi;
+
 const TUTORIALS = {
   'easy-crochet-baby-booties-pattern-for-beginners-sara-rain-crochet': ['baby-booties', ['01-baby-booties-materials.jpg','02-baby-booties-start-sole.jpg','03-baby-booties-sole-rounds.jpg','04-baby-booties-toe.jpg','05-baby-booties-sides.jpg','06-baby-booties-cuff.jpg','07-baby-booties-finishing.jpg','08-baby-booties-finished.jpg'], ['Materials & Yarn','Starting the Sole','Building the Sole','Shaping the Toe','Crocheting the Sides','Creating the Cuff','Finishing & Weaving Ends','Finished Baby Booties']],
   'crochet-beanie-for-beginners-sara-rain-crochet': ['crochet-beanie', ['01-beanie-materials.jpg','02-beanie-starting-crown.jpg','03-beanie-crown-rounds.jpg','04-beanie-crown-complete.jpg','05-beanie-side-walls.jpg','06-beanie-shaping.jpg','07-beanie-finishing.jpg','08-beanie-finished.jpg'], ['Materials & Hook','Starting the Crown','Working the Crown Rounds','Completed Crown','Building the Side Walls','Shaping the Beanie','Finishing & Weaving Ends','Finished Crochet Beanie']],
@@ -22,19 +25,39 @@ function enhance(html, config) {
   return html.slice(0, at) + block + html.slice(at).replace('</head>', CSS + '</head>');
 }
 
+function stripRemovedHomeCards(html) {
+  return html.replace(REMOVED_HOME_CARDS, '');
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const slug = url.pathname.replace(/^\/posts\//, '').replace(/\.html$/, '').replace(/\/$/, '');
+
+    if (slug === REMOVED_SLUG) {
+      return new Response('Not Found', {
+        status: 404,
+        headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' }
+      });
+    }
+
+    const isHome = url.pathname === '/' || url.pathname === '/index.html';
     const config = TUTORIALS[slug];
-    if (!config) return baseWorker.fetch(request, env, ctx);
+    if (!config && !isHome) return baseWorker.fetch(request, env, ctx);
+
     const response = await baseWorker.fetch(request, env, ctx);
     const type = response.headers.get('content-type') || '';
     if (!response.ok || !type.includes('text/html')) return response;
+
     const html = await response.text();
     const headers = new Headers(response.headers);
     headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     headers.delete('ETag');
+
+    if (isHome) {
+      return new Response(stripRemovedHomeCards(html), { status: response.status, statusText: response.statusText, headers });
+    }
+
     return new Response(enhance(html, config), { status: response.status, statusText: response.statusText, headers });
   }
 };
