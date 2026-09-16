@@ -1,6 +1,6 @@
 {
   "name": "crochet",
-  "main": "src/tutorial-image-wrapper.js",
+  "main": "src/google-verification-wrapper.js",
   "compatibility_date": "2026-09-15",
   "assets": {
     "directory": "./dist",
