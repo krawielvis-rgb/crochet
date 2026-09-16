@@ -29,7 +29,7 @@ npx wrangler deploy
 
 After deployment, open:
 
-`https://crochet.krawielvis.workers.dev/sara`
+`https://sararaincrochet.com/sara`
 
 The admin accepts either `ADMIN_USERNAME` or `ADMIN_EMAIL` as the login identifier.
 

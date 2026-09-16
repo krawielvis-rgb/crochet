@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import seoContentUpgrade from './src/seo-upgrade.js'
 
-const site = 'https://crochet.krawielvis.workers.dev'
+const site = 'https://sararaincrochet.com'
 
 const seo = {
   'first-crochet-project': { title: 'Your First Crochet Project — Beginner Practice Pattern', description: 'Learn crochet from scratch with a simple numbered practice pattern, essential stitches, yarn and hook tips, and finishing steps.', related: ['crochet-tension-guide','crochet-hook-sizes-guide','yarn-guide'] },

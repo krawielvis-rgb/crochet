@@ -2,7 +2,7 @@
 
 A responsive, SEO-ready editorial site for crochet tutorials, materials guides, and handmade-project inspiration.
 
-**Live site:** [https://crochet.krawielvis.workers.dev](https://crochet.krawielvis.workers.dev)
+**Live site:** [https://sararaincrochet.com](https://sararaincrochet.com)
 
 ## Features
 
