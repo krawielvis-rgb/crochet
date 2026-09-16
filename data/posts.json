@@ -1,14 +1,5 @@
 [
   {
-    "slug": "crochet-dog-bandana",
-    "title": "Crochet Dog Bandana",
-    "description": "Learn how to crochet a cute beginner-friendly dog bandana with a simple triangle shape, easy rows, edging, and a comfortable adjustable fit.",
-    "category": "Pet projects",
-    "readTime": "11 min read",
-    "image": "/images/pins/pin-crochet-dog-bandana.jpg",
-    "published": true
-  },
-  {
     "slug": "crochet-baby-blanket",
     "title": "Crochet Baby Blanket",
     "description": "A soft, beginner-friendly crochet baby blanket with a simple shell texture, gentle shaping, and a scalloped border.",
@@ -155,6 +146,26 @@
     "finishing": "Weave in ends on the inside and reinforce tie attachment points with extra stitches.",
     "variations": "Make a striped version, add a scalloped edge, or turn it into a longer tank by extending the panels.",
     "care": "Wash according to the cotton label and dry flat to help preserve the shape."
+  },
+  {
+    "slug": "crochet-dog-bandana",
+    "title": "Crochet Dog Bandana",
+    "description": "Learn how to crochet a cute beginner-friendly dog bandana with a simple triangle shape, easy rows, edging, and a comfortable adjustable fit.",
+    "category": "Pet projects",
+    "readTime": "11 min read",
+    "image": "/images/pins/pin-crochet-dog-bandana.jpg",
+    "published": true,
+    "materials": "Medium cotton yarn, 4.5 mm hook, scissors, yarn needle",
+    "intro": "Measure around the pet’s neck and choose a finished bandana width that leaves room for movement. The sample approach is intentionally simple so you can adjust the triangle easily.",
+    "steps": [
+      "Start at the top edge and decrease toward the point, or build a triangle from the point outward depending on your preferred construction.",
+      "Add an even edging and a tie or casing that sits comfortably around the neck."
+    ],
+    "checkpoint": "Try the bandana on before trimming the ties. It should rest comfortably without pressing into the throat or restricting movement.",
+    "troubleshooting": "If the triangle twists, check that decreases are centered. If the tie feels bulky, use a narrower cord or work a casing instead.",
+    "finishing": "Weave in ends thoroughly and inspect the fabric for loose loops before use.",
+    "variations": "Make seasonal colors, a small embroidered initial, or a matching human-and-pet set.",
+    "care": "Hand wash gently and dry flat when recommended. Inspect regularly for wear."
   },
   {
     "slug": "crochet-ear-warmer",
@@ -418,26 +429,6 @@
     "finishing": "Weave in ends inside the sock and smooth the heel seam so it does not rub.",
     "variations": "Try ankle stripes, contrast cuffs, or a simple textured foot.",
     "care": "Wash according to the yarn label and dry flat when recommended."
-  },
-  {
-    "slug": "crochet-sunglasses-case",
-    "title": "Crochet Sunglasses Case",
-    "description": "A slim crochet glasses case with a rectangular body, button closure, and protective snug fit.",
-    "category": "Summer accessories",
-    "readTime": "10 min read",
-    "image": "/images/pins/pin-crochet-sunglasses-case-for-beginners.jpg",
-    "published": true,
-    "materials": "Cotton yarn, 4 mm hook, yarn needle, button",
-    "intro": "Measure the sunglasses including their widest points. The case should protect the glasses without forcing the frames into a tight opening.",
-    "steps": [
-      "Work a rectangle to the measured width, fold it into a sleeve, seam the sides, and add a flap with a button closure.",
-      "Test the glasses inside before trimming the final ends."
-    ],
-    "checkpoint": "Slide the glasses in and out several times. The opening should be easy to use while the closure keeps the case shut.",
-    "troubleshooting": "If the case is too tight, add width or use a larger hook. If the flap is too short, add rows before sewing the button.",
-    "finishing": "Reinforce the button and flap loop with extra stitches and weave the ends inside the seam area.",
-    "variations": "Add a contrast lining, a wrist loop, stripes, or a small flower.",
-    "care": "Keep the case dry and wash according to the yarn label."
   },
   {
     "slug": "crochet-table-runner",
