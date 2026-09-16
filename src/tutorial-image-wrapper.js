@@ -1,7 +1,6 @@
 import baseWorker from './worker-v2.js';
 
 const REMOVED_SLUG = 'crochet-sunglasses-case';
-const REMOVED_HOME_CARDS = /<a class="pinterest-card" href="\/posts\/(?:crochet-sunglasses-case|crochet-sunglasses-case-for-beginners)\.html">[\s\S]*?<\/a>\s*/gi;
 
 const TUTORIALS = {
   'easy-crochet-baby-booties-pattern-for-beginners-sara-rain-crochet': ['baby-booties', ['01-baby-booties-materials.jpg','02-baby-booties-start-sole.jpg','03-baby-booties-sole-rounds.jpg','04-baby-booties-toe.jpg','05-baby-booties-sides.jpg','06-baby-booties-cuff.jpg','07-baby-booties-finishing.jpg','08-baby-booties-finished.jpg'], ['Materials & Yarn','Starting the Sole','Building the Sole','Shaping the Toe','Crocheting the Sides','Creating the Cuff','Finishing & Weaving Ends','Finished Baby Booties']],
@@ -16,17 +15,21 @@ function gallery(folder, files, titles) {
   return `<section class="tutorial-process-gallery" aria-label="Visual step-by-step tutorial"><h2>Visual Step-by-Step</h2>${files.map((file,i) => `<figure class="tutorial-process-image"><img src="/images/tutorials/${folder}/${file}?v=2" alt="${titles[i]} — crochet tutorial step ${i+1}"><figcaption><span class="tutorial-process-label">Step ${i+1}</span><strong>${titles[i]}</strong></figcaption></figure>`).join('')}</section>`;
 }
 
+function removeSunglassesCards(html) {
+  return html.replace(/<a\b[^>]*class=["'][^"']*pinterest-card[^"']*["'][^>]*>[\s\S]*?<\/a>/gi, (card) => {
+    const normalized = card.toLowerCase().replace(/\s+/g, ' ');
+    return normalized.includes('crochet-sunglasses-case') || normalized.includes('crochet sunglasses case') ? '' : card;
+  });
+}
+
 function enhance(html, config) {
+  if (html.includes('pinterest-grid')) html = removeSunglassesCards(html);
   if (html.includes('tutorial-process-gallery')) return html;
   const block = gallery(config[0], config[1], config[2]);
   const mainOpen = html.match(/<main\b[^>]*>/i);
   if (!mainOpen) return html;
   const at = mainOpen.index + mainOpen[0].length;
   return html.slice(0, at) + block + html.slice(at).replace('</head>', CSS + '</head>');
-}
-
-function stripRemovedHomeCards(html) {
-  return html.replace(REMOVED_HOME_CARDS, '');
 }
 
 export default {
@@ -55,7 +58,7 @@ export default {
     headers.delete('ETag');
 
     if (isHome) {
-      return new Response(stripRemovedHomeCards(html), { status: response.status, statusText: response.statusText, headers });
+      return new Response(removeSunglassesCards(html), { status: response.status, statusText: response.statusText, headers });
     }
 
     return new Response(enhance(html, config), { status: response.status, statusText: response.statusText, headers });
