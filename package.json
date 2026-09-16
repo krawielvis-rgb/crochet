@@ -1,8 +1,18 @@
 {
   "name": "crochet-journal",
   "version": "1.0.0",
+  "description": "Sara Rain Crochet — a responsive, SEO-ready editorial site for crochet tutorials, patterns, and beginner guides.",
   "type": "module",
   "private": true,
-  "scripts": { "start": "vite", "build": "vite build", "preview": "vite preview" },
-  "devDependencies": { "vite": "latest" }
+  "author": "Sara Rain Crochet",
+  "license": "UNLICENSED",
+  "keywords": ["crochet", "tutorials", "patterns", "amigurumi", "beginner", "vite", "static-site"],
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "latest"
+  }
 }
