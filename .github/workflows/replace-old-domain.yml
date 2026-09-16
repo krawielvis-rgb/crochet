@@ -1,0 +1,61 @@
+name: Replace old crochet domain once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/replace-old-domain.yml
+
+permissions:
+  contents: write
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Replace exact old domain everywhere
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+
+          old = 'https://' + 'crochet.krawielvis.workers.dev'
+          new = 'https://sararaincrochet.com'
+
+          files = subprocess.check_output(
+              ['git', 'grep', '-Il', old],
+              text=True
+          ).splitlines()
+
+          changed = []
+          for name in files:
+              path = Path(name)
+              text = path.read_text(encoding='utf-8')
+              updated = text.replace(old, new)
+              if updated != text:
+                  path.write_text(updated, encoding='utf-8')
+                  changed.append(name)
+
+          print('Modified files:')
+          for name in changed:
+              print(name)
+          print(f'Total modified files: {len(changed)}')
+          PY
+
+      - name: Remove one-time workflow and commit replacements
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git rm -f .github/workflows/replace-old-domain.yml
+          if git diff --cached --quiet; then
+            echo "No old-domain references found."
+            exit 0
+          fi
+          git commit -m "Replace old crochet domain with custom domain"
+          git push
