@@ -65,19 +65,18 @@ export default {
 
     const response = await tutorialWorker.fetch(request, env, ctx);
     const contentType = response.headers.get('content-type') || '';
-
     if (!contentType.includes('text/html')) return response;
 
     const html = await response.text();
     const hasVerification = html.includes('eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o');
-    const hasAnalytics = html.includes(`G-NS6VRFWC64`);
+    const hasAnalytics = html.includes(GA_ID);
 
     let updated = html;
     if (!hasVerification) {
-      updated = updated.replace(/<\/head>/i, `  ${GOOGLE_TAG}\n</head>`);
+      updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GOOGLE_TAG}`);
     }
     if (!hasAnalytics) {
-      updated = updated.replace(/<\/head>/i, `  ${GA_TAG}\n</head>`);
+      updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GA_TAG}`);
     }
 
     if (updated === html) return new Response(html, response);
