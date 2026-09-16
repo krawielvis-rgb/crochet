@@ -85,21 +85,24 @@
       letter-spacing: .1em; text-transform: uppercase;
       margin: 0 0 8px; color: var(--ink);
     }
-    input, textarea, select {
+    input, textarea {
       width: 100%; border: 1px solid var(--line);
       background: #fff; padding: 14px 16px;
       font: 15px/1.5 'DM Sans', sans-serif; color: var(--ink);
       border-radius: 14px; outline: none;
     }
-    input:focus, textarea:focus, select:focus {
+    input:focus, textarea:focus {
       border-color: rgba(25,48,43,.35);
       box-shadow: 0 0 0 3px rgba(25,48,43,.08);
     }
-    textarea { min-height: 160px; resize: vertical; }
-    textarea.tall { min-height: 280px; }
+    textarea {
+      min-height: 420px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+    }
     .field { margin-bottom: 18px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } .panel { padding: 22px; } }
 
     .upload {
       border: 1.5px dashed rgba(25,48,43,.22);
@@ -140,9 +143,12 @@
       padding: 14px; border: 1px solid var(--line);
       border-radius: 16px; background: #fff;
     }
-    .post-item img {
-      width: 72px; height: 96px; object-fit: cover; border-radius: 10px;
+    .post-item .thumb {
+      width: 72px; height: 96px; border-radius: 10px;
       background: var(--soft);
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
     }
     .post-item h3 {
       margin: 0 0 4px; font: 600 17px/1.25 Fraunces, Georgia, serif;
@@ -151,11 +157,6 @@
     .post-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
     .hint { font-size: 13px; color: var(--muted); margin: 8px 0 0; line-height: 1.55; }
-    .section-note {
-      background: #f1ebe3; border-left: 4px solid var(--rose);
-      padding: 14px 16px; border-radius: 0 12px 12px 0;
-      margin-bottom: 20px; font-size: 14px;
-    }
   </style>
 </head>
 <body>
@@ -184,7 +185,6 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 let imageData = '';
 let postsCache = [];
-let editingSlug = null;
 
 async function api(path, opt = {}) {
   const r = await fetch(path, {
@@ -202,6 +202,16 @@ function statusEl(id, text, type = '') {
   el.textContent = text;
   el.className = 'status ' + type;
   el.classList.remove('hidden');
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+}
+
+function pinUrl(p) {
+  if (p.image && (p.image.startsWith('http') || p.image.startsWith('/'))) return p.image;
+  if (p.slug) return `/images/pins/pin-${p.slug}.jpg`;
+  return '';
 }
 
 async function start() {
@@ -222,90 +232,28 @@ function showDashboard() {
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-tab="publish">Publish new</button>
+      <button class="tab active" data-tab="publish">Publish</button>
       <button class="tab" data-tab="manage">Manage pins</button>
     </div>
 
     <div id="tab-publish">
       <div class="panel">
         <div class="kicker">Quick publish</div>
-        <h1>New crochet tutorial</h1>
-        <p class="muted">Upload the Pinterest pin image and paste the pattern content. The site template adds headers, structure, SEO, and footer automatically.</p>
-
-        <div class="section-note">
-          Tip: Paste content from ChatGPT as plain text. Use blank lines between sections. You can also fill the structured fields below for better results.
-        </div>
+        <h1>Publish a tutorial</h1>
+        <p class="muted">Upload the Pinterest pin and paste your finished HTML. Title, description, and URL are detected automatically.</p>
 
         <form id="postForm">
           <div class="upload field">
-            <label>1 · Pinterest pin image</label>
+            <label>1 · Pinterest pin</label>
             <input id="image" type="file" accept="image/jpeg,image/png,image/webp" required>
             <p class="hint">JPG, PNG, or WebP · max ~4 MB</p>
             <img id="preview" class="preview" alt="Preview">
           </div>
 
-          <div class="grid-2">
-            <div class="field">
-              <label>Title</label>
-              <input id="title" required placeholder="e.g. Easy Crochet Market Bag">
-            </div>
-            <div class="field">
-              <label>Category</label>
-              <input id="category" placeholder="Crochet tutorial" value="Crochet tutorial">
-            </div>
-          </div>
-
           <div class="field">
-            <label>Short description (SEO)</label>
-            <textarea id="description" required placeholder="One or two sentences for search & social."></textarea>
-          </div>
-
-          <div class="field">
-            <label>Materials</label>
-            <textarea id="materials" placeholder="Yarn, hook size, notions…"></textarea>
-          </div>
-
-          <div class="field">
-            <label>Intro / overview</label>
-            <textarea id="intro" placeholder="A short introduction to the project."></textarea>
-          </div>
-
-          <div class="field">
-            <label>Step-by-step (one step per line)</label>
-            <textarea id="steps" class="tall" placeholder="Start with the foundation chain.\nWork the first row evenly.\nContinue until the desired size…"></textarea>
-          </div>
-
-          <div class="grid-2">
-            <div class="field">
-              <label>Checkpoint</label>
-              <textarea id="checkpoint" placeholder="What to check before continuing…"></textarea>
-            </div>
-            <div class="field">
-              <label>Troubleshooting</label>
-              <textarea id="troubleshooting" placeholder="Common problems and fixes…"></textarea>
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div class="field">
-              <label>Finishing</label>
-              <textarea id="finishing" placeholder="Weave ends, block, attach hardware…"></textarea>
-            </div>
-            <div class="field">
-              <label>Variations</label>
-              <textarea id="variations" placeholder="Color ideas, size changes…"></textarea>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Care & storage</label>
-            <textarea id="care" placeholder="Washing and storage notes…"></textarea>
-          </div>
-
-          <div class="field">
-            <label>Or paste full pattern content (optional helper)</label>
-            <textarea id="rawContent" class="tall" placeholder="Paste a big block of text from ChatGPT. We will try to map it into the fields above if they are empty."></textarea>
-            <p class="hint">If the structured fields are empty, the publisher will use this text as the main body.</p>
+            <label>2 · Tutorial HTML</label>
+            <textarea id="html" required placeholder="Paste the complete HTML tutorial here..."></textarea>
+            <p class="hint">Needs a <title> or <h1>. The first image is replaced with your uploaded pin.</p>
           </div>
 
           <button id="publishBtn" class="btn btn-primary">Publish tutorial</button>
@@ -361,29 +309,17 @@ function showDashboard() {
     statusEl('#status', 'Publishing…');
     btn.disabled = true;
     try {
-      const payload = {
-        title: $('#title').value.trim(),
-        description: $('#description').value.trim(),
-        category: $('#category').value.trim() || 'Crochet tutorial',
-        materials: $('#materials').value.trim(),
-        intro: $('#intro').value.trim(),
-        steps: $('#steps').value.trim(),
-        checkpoint: $('#checkpoint').value.trim(),
-        troubleshooting: $('#troubleshooting').value.trim(),
-        finishing: $('#finishing').value.trim(),
-        variations: $('#variations').value.trim(),
-        care: $('#care').value.trim(),
-        rawContent: $('#rawContent').value.trim(),
-        imageDataUrl: imageData,
-        slug: editingSlug || undefined
-      };
-      const d = await api('/api/admin/publish', { method: 'POST', body: JSON.stringify(payload) });
+      const d = await api('/api/admin/publish-html', {
+        method: 'POST',
+        body: JSON.stringify({
+          html: $('#html').value,
+          imageDataUrl: imageData
+        })
+      });
       statusEl('#status', 'Published! ' + d.url, 'success');
       $('#postForm').reset();
       $('#preview').style.display = 'none';
       imageData = '';
-      editingSlug = null;
-      btn.textContent = 'Publish tutorial';
     } catch (err) {
       statusEl('#status', err.message, 'error');
     } finally {
@@ -401,23 +337,23 @@ async function loadPosts() {
       list.innerHTML = '<p class="muted">No published tutorials yet.</p>';
       return;
     }
-    list.innerHTML = postsCache.map(p => `
-      <div class="post-item" data-slug="${p.slug}">
-        <img src="${p.image || ''}" alt="" onerror="this.style.background='#eee8dc'">
+    list.innerHTML = postsCache.map(p => {
+      const img = pinUrl(p);
+      const bg = img ? `style="background-image:url('${img.replace(/'/g, "%27")}')"` : '';
+      return `
+      <div class="post-item" data-slug="${escapeHtml(p.slug)}">
+        <div class="thumb" ${bg}></div>
         <div>
           <h3>${escapeHtml(p.title || p.slug)}</h3>
           <p>${escapeHtml(p.category || 'Tutorial')} · /posts/${escapeHtml(p.slug)}.html</p>
         </div>
         <div class="post-actions">
-          <button class="btn" data-edit="${p.slug}">Edit</button>
-          <button class="btn btn-danger" data-delete="${p.slug}">Delete</button>
+          <a class="btn" href="/posts/${escapeHtml(p.slug)}.html" target="_blank" rel="noopener">View</a>
+          <button class="btn btn-danger" data-delete="${escapeHtml(p.slug)}">Delete</button>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
 
-    list.querySelectorAll('[data-edit]').forEach(btn => {
-      btn.onclick = () => editPost(btn.dataset.edit);
-    });
     list.querySelectorAll('[data-delete]').forEach(btn => {
       btn.onclick = () => deletePost(btn.dataset.delete);
     });
@@ -426,31 +362,8 @@ async function loadPosts() {
   }
 }
 
-function editPost(slug) {
-  const p = postsCache.find(x => x.slug === slug);
-  if (!p) return;
-  editingSlug = slug;
-  $$('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === 'publish'));
-  $('#tab-publish').classList.remove('hidden');
-  $('#tab-manage').classList.add('hidden');
-  $('#title').value = p.title || '';
-  $('#description').value = p.description || '';
-  $('#category').value = p.category || 'Crochet tutorial';
-  $('#materials').value = p.materials || '';
-  $('#intro').value = p.intro || '';
-  $('#steps').value = Array.isArray(p.steps) ? p.steps.join('\n') : (p.steps || '');
-  $('#checkpoint').value = p.checkpoint || '';
-  $('#troubleshooting').value = p.troubleshooting || '';
-  $('#finishing').value = p.finishing || '';
-  $('#variations').value = p.variations || '';
-  $('#care').value = p.care || '';
-  $('#publishBtn').textContent = 'Update tutorial';
-  statusEl('#status', 'Editing “' + (p.title || slug) + '”. Upload a new image only if you want to replace the pin.', '');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 async function deletePost(slug) {
-  if (!confirm('Delete “' + slug + '” from the catalog? The HTML file may remain until cleaned up.')) return;
+  if (!confirm('Remove “' + slug + '” from the catalog?')) return;
   try {
     statusEl('#manageStatus', 'Deleting…');
     await api('/api/admin/delete', { method: 'POST', body: JSON.stringify({ slug }) });
@@ -459,10 +372,6 @@ async function deletePost(slug) {
   } catch (err) {
     statusEl('#manageStatus', err.message, 'error');
   }
-}
-
-function escapeHtml(s) {
-  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
 }
 
 $('#loginForm').onsubmit = async e => {
