@@ -1,6 +1,15 @@
 import tutorialWorker from './tutorial-image-wrapper.js';
 
 const GOOGLE_TAG = '<meta name="google-site-verification" content="eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o" />';
+const GA_ID = 'G-NS6VRFWC64';
+const GA_TAG = `<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '${GA_ID}');
+</script>`;
 
 const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -60,11 +69,19 @@ export default {
     if (!contentType.includes('text/html')) return response;
 
     const html = await response.text();
-    if (html.includes('eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o')) {
-      return new Response(html, response);
+    const hasVerification = html.includes('eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o');
+    const hasAnalytics = html.includes(`G-NS6VRFWC64`);
+
+    let updated = html;
+    if (!hasVerification) {
+      updated = updated.replace(/<\/head>/i, `  ${GOOGLE_TAG}\n</head>`);
+    }
+    if (!hasAnalytics) {
+      updated = updated.replace(/<\/head>/i, `  ${GA_TAG}\n</head>`);
     }
 
-    const updated = html.replace(/<\/head>/i, `  ${GOOGLE_TAG}\n</head>`);
+    if (updated === html) return new Response(html, response);
+
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
