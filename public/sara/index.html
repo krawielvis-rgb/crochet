@@ -180,16 +180,16 @@ async function api(path, opt = {}) {
   return d;
 }
 
-function statusEl(id, text, type = '') {
+function statusEl(id, text, type) {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = text;
-  el.className = 'status ' + type;
+  el.className = 'status' + (type ? (' ' + type) : '');
   el.classList.remove('hidden');
 }
 
 function escapeHtml(s) {
-  return String(s || '')
+  return String(s == null ? '' : s)
     .replace(/&/g, '&')
     .replace(/</g, '<')
     .replace(/>/g, '>')
@@ -197,9 +197,22 @@ function escapeHtml(s) {
 }
 
 function pinUrl(p) {
-  if (p && p.image && (p.image.startsWith('http') || p.image.startsWith('/'))) return p.image;
+  if (p && p.image && (String(p.image).indexOf('http') === 0 || String(p.image).charAt(0) === '/')) {
+    return p.image;
+  }
   if (p && p.slug) return '/images/pins/pin-' + p.slug + '.jpg';
   return '';
+}
+
+function switchTab(name) {
+  $$('.tab').forEach(function (x) {
+    x.classList.toggle('active', x.getAttribute('data-tab') === name);
+  });
+  var publish = document.getElementById('tab-publish');
+  var manage = document.getElementById('tab-manage');
+  if (publish) publish.classList.toggle('hidden', name !== 'publish');
+  if (manage) manage.classList.toggle('hidden', name !== 'manage');
+  if (name === 'manage') loadPosts();
 }
 
 function showLogin() {
@@ -209,20 +222,15 @@ function showLogin() {
       '<h1>Admin login</h1>' +
       '<p class="muted">Sign in with the admin username or email and password.</p>' +
       '<form id="loginForm">' +
-        '<div class="field">' +
-          '<label>Username or email</label>' +
-          '<input id="identifier" autocomplete="username" required>' +
-        '</div>' +
-        '<div class="field">' +
-          '<label>Password</label>' +
-          '<input id="password" type="password" autocomplete="current-password" required>' +
-        '</div>' +
+        '<div class="field"><label>Username or email</label>' +
+        '<input id="identifier" autocomplete="username" required></div>' +
+        '<div class="field"><label>Password</label>' +
+        '<input id="password" type="password" autocomplete="current-password" required></div>' +
         '<button class="btn btn-primary" style="width:100%">Sign in</button>' +
         '<div id="loginStatus" class="status hidden"></div>' +
-      '</form>' +
-    '</div>';
+      '</form></div>';
 
-  document.getElementById('loginForm').onsubmit = async (e) => {
+  document.getElementById('loginForm').onsubmit = async function (e) {
     e.preventDefault();
     statusEl('loginStatus', 'Signing in…');
     try {
@@ -233,7 +241,7 @@ function showLogin() {
           password: document.getElementById('password').value
         })
       });
-      const s = await api('/api/admin/session');
+      var s = await api('/api/admin/session');
       if (!s.authenticated) throw Error('Login succeeded but session cookie was not accepted.');
       showDashboard();
     } catch (err) {
@@ -256,7 +264,7 @@ function showDashboard() {
       '<div class="panel">' +
         '<div class="kicker">Quick publish</div>' +
         '<h1>Publish a tutorial</h1>' +
-        '<p class="muted">Upload the Pinterest pin and paste your finished HTML. Title, description, and URL are detected automatically.</p>' +
+        '<p class="muted">Upload the Pinterest pin and paste your finished HTML. Title, description, and URL are detected automatically. To edit an existing pin, open Manage and click Edit, then paste the updated HTML with the same title.</p>' +
         '<form id="postForm">' +
           '<div class="upload field">' +
             '<label>1 · Pinterest pin</label>' +
@@ -278,46 +286,35 @@ function showDashboard() {
       '<div class="panel">' +
         '<div class="kicker">Library</div>' +
         '<h2>Published pins</h2>' +
-        '<p class="muted">All tutorials currently in the catalog. Delete removes them from the homepage catalog.</p>' +
+        '<p class="muted">All tutorials currently in the catalog. Edit opens Publish so you can replace the HTML and pin image. Delete removes the entry from the homepage catalog.</p>' +
         '<div id="postList" class="post-list">Loading…</div>' +
         '<div id="manageStatus" class="status hidden"></div>' +
       '</div>' +
     '</div>';
 
-  document.getElementById('logout').onclick = async () => {
+  document.getElementById('logout').onclick = async function () {
     await api('/api/admin/logout', { method: 'POST', body: '{}' });
     location.reload();
   };
 
-  $$('.tab').forEach((t) => {
-    t.onclick = () => {
-      const name = t.getAttribute('data-tab');
-      $$('.tab').forEach((x) => x.classList.remove('active'));
-      t.classList.add('active');
-
-      const publish = document.getElementById('tab-publish');
-      const manage = document.getElementById('tab-manage');
-      if (publish) publish.classList.toggle('hidden', name !== 'publish');
-      if (manage) manage.classList.toggle('hidden', name !== 'manage');
-
-      if (name === 'manage') loadPosts();
-    };
+  $$('.tab').forEach(function (t) {
+    t.onclick = function () { switchTab(t.getAttribute('data-tab')); };
   });
 
-  const imageInput = document.getElementById('image');
+  var imageInput = document.getElementById('image');
   if (imageInput) {
-    imageInput.onchange = () => {
-      const f = imageInput.files && imageInput.files[0];
+    imageInput.onchange = function () {
+      var f = imageInput.files && imageInput.files[0];
       if (!f) return;
       if (f.size > 4 * 1024 * 1024) {
         statusEl('status', 'Please keep the image under 4 MB.', 'error');
         imageInput.value = '';
         return;
       }
-      const r = new FileReader();
-      r.onload = () => {
+      var r = new FileReader();
+      r.onload = function () {
         imageData = r.result;
-        const prev = document.getElementById('preview');
+        var prev = document.getElementById('preview');
         if (prev) {
           prev.src = imageData;
           prev.style.display = 'block';
@@ -327,24 +324,25 @@ function showDashboard() {
     };
   }
 
-  const form = document.getElementById('postForm');
+  var form = document.getElementById('postForm');
   if (form) {
-    form.onsubmit = async (e) => {
+    form.onsubmit = async function (e) {
       e.preventDefault();
-      const btn = document.getElementById('publishBtn');
+      var btn = document.getElementById('publishBtn');
       statusEl('status', 'Publishing…');
       if (btn) btn.disabled = true;
       try {
-        const html = document.getElementById('html').value;
-        const d = await api('/api/admin/publish-html', {
+        var html = document.getElementById('html').value;
+        var d = await api('/api/admin/publish-html', {
           method: 'POST',
           body: JSON.stringify({ html: html, imageDataUrl: imageData })
         });
         statusEl('status', 'Published! ' + d.url, 'success');
         form.reset();
-        const prev = document.getElementById('preview');
+        var prev = document.getElementById('preview');
         if (prev) prev.style.display = 'none';
         imageData = '';
+        if (btn) btn.textContent = 'Publish tutorial';
       } catch (err) {
         statusEl('status', err.message, 'error');
       } finally {
@@ -354,8 +352,24 @@ function showDashboard() {
   }
 }
 
+function editPost(slug) {
+  var p = null;
+  for (var i = 0; i < postsCache.length; i++) {
+    if (postsCache[i].slug === slug) { p = postsCache[i]; break; }
+  }
+  switchTab('publish');
+  var btn = document.getElementById('publishBtn');
+  if (btn) btn.textContent = 'Update tutorial';
+  statusEl(
+    'status',
+    'Editing “' + (p && p.title ? p.title : slug) + '”. Paste the updated full HTML and upload a pin image (same title will overwrite the existing post).',
+    ''
+  );
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 async function loadPosts() {
-  const list = document.getElementById('postList');
+  var list = document.getElementById('postList');
   if (!list) return;
   list.innerHTML = 'Loading…';
   try {
@@ -364,12 +378,12 @@ async function loadPosts() {
       list.innerHTML = '<p class="muted">No published tutorials in the catalog yet.</p>';
       return;
     }
-    list.innerHTML = postsCache.map((p) => {
-      const img = pinUrl(p);
-      const bg = img ? ('style="background-image:url(\'' + String(img).replace(/'/g, '%27') + '\')"') : '';
-      const slug = escapeHtml(p.slug || '');
-      const title = escapeHtml(p.title || p.slug || 'Untitled');
-      const cat = escapeHtml(p.category || 'Tutorial');
+    list.innerHTML = postsCache.map(function (p) {
+      var img = pinUrl(p);
+      var bg = img ? ('style="background-image:url(\'' + String(img).replace(/'/g, '%27') + '\')"') : '';
+      var slug = escapeHtml(p.slug || '');
+      var title = escapeHtml(p.title || p.slug || 'Untitled');
+      var cat = escapeHtml(p.category || 'Tutorial');
       return (
         '<div class="post-item" data-slug="' + slug + '">' +
           '<div class="thumb" ' + bg + '></div>' +
@@ -379,14 +393,18 @@ async function loadPosts() {
           '</div>' +
           '<div class="post-actions">' +
             '<a class="btn" href="/posts/' + slug + '.html" target="_blank" rel="noopener">View</a>' +
+            '<button type="button" class="btn" data-edit="' + slug + '">Edit</button>' +
             '<button type="button" class="btn btn-danger" data-delete="' + slug + '">Delete</button>' +
           '</div>' +
         '</div>'
       );
     }).join('');
 
-    list.querySelectorAll('[data-delete]').forEach((btn) => {
-      btn.onclick = () => deletePost(btn.getAttribute('data-delete'));
+    list.querySelectorAll('[data-delete]').forEach(function (btn) {
+      btn.onclick = function () { deletePost(btn.getAttribute('data-delete')); };
+    });
+    list.querySelectorAll('[data-edit]').forEach(function (btn) {
+      btn.onclick = function () { editPost(btn.getAttribute('data-edit')); };
     });
   } catch (err) {
     list.innerHTML = '<p class="status error">' + escapeHtml(err.message) + '</p>';
@@ -408,7 +426,7 @@ async function deletePost(slug) {
 
 async function start() {
   try {
-    const s = await api('/api/admin/session');
+    var s = await api('/api/admin/session');
     if (s.authenticated) showDashboard();
     else showLogin();
   } catch (e) {
