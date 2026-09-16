@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Sara Rain Crochet sitemap -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://crochet.krawielvis.workers.dev/</loc><lastmod>2026-09-14</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://crochet.krawielvis.workers.dev/</loc><lastmod>2026-09-16</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/about.html</loc><lastmod>2026-09-14</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/privacy-policy.html</loc><lastmod>2026-09-14</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/cookie-policy.html</loc><lastmod>2026-09-14</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/terms.html</loc><lastmod>2026-09-14</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/contact.html</loc><lastmod>2026-09-14</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/pinterest-tutorials.html</loc><lastmod>2026-09-13</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://crochet.krawielvis.workers.dev/posts/first-crochet-project.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://crochet.krawielvis.workers.dev/posts/first-crochet-project.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/granny-square.html</loc><lastmod>2026-09-13</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/yarn-guide.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/amigurumi.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
@@ -34,6 +34,5 @@
   <url><loc>https://crochet.krawielvis.workers.dev/posts/crochet-market-bag.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/seasonal-crochet-projects.html</loc><lastmod>2026-09-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/crochet-pencil-bag.html</loc><lastmod>2026-09-13</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://crochet.krawielvis.workers.dev/posts/sunflower-granny-square.html</loc><lastmod>2026-09-13</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://crochet.krawielvis.workers.dev/posts/crochet-bag-charms.html</loc><lastmod>2026-09-14</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
 </urlset>
