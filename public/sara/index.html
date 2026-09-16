@@ -44,7 +44,7 @@
       border: 1px solid var(--line); background: var(--paper);
       color: var(--ink); padding: 11px 16px; border-radius: 999px;
       font: 600 13px 'DM Sans', sans-serif; cursor: pointer;
-      transition: .2s ease;
+      transition: .2s ease; text-decoration: none; display: inline-block;
     }
     .btn:hover { background: var(--soft); }
     .btn-primary {
@@ -153,14 +153,53 @@
     .post-item h3 {
       margin: 0 0 4px; font: 600 17px/1.25 Fraunces, Georgia, serif;
     }
-    .post-item p { margin: 0; font-size: 13px; color: var(--muted); }
+    .post-item p { margin: 0; font-size: 13px; color: var(--muted); word-break: break-all; }
     .post-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
     .hint { font-size: 13px; color: var(--muted); margin: 8px 0 0; line-height: 1.55; }
   </style>
 </head>
 <body>
-  <div id="app" class="wrap">
+  <div id="app" class="wrap"></div>
+
+<script>
+const $ = (s, root = document) => root.querySelector(s);
+const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+
+let imageData = '';
+let postsCache = [];
+
+async function api(path, opt = {}) {
+  const r = await fetch(path, {
+    ...opt,
+    credentials: 'include',
+    headers: { 'content-type': 'application/json', ...(opt.headers || {}) }
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw Error(d.error || `Request failed (${r.status})`);
+  return d;
+}
+
+function statusEl(id, text, type = '') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'status ' + type;
+  el.classList.remove('hidden');
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+}
+
+function pinUrl(p) {
+  if (p && p.image && (p.image.startsWith('http') || p.image.startsWith('/'))) return p.image;
+  if (p && p.slug) return '/images/pins/pin-' + p.slug + '.jpg';
+  return '';
+}
+
+function showLogin() {
+  document.getElementById('app').innerHTML = `
     <div class="panel login">
       <div class="kicker">Sara Rain Crochet · Private</div>
       <h1>Admin login</h1>
@@ -177,63 +216,38 @@
         <button class="btn btn-primary" style="width:100%">Sign in</button>
         <div id="loginStatus" class="status hidden"></div>
       </form>
-    </div>
-  </div>
+    </div>`;
 
-<script>
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-let imageData = '';
-let postsCache = [];
-
-async function api(path, opt = {}) {
-  const r = await fetch(path, {
-    ...opt,
-    credentials: 'include',
-    headers: { 'content-type': 'application/json', ...(opt.headers || {}) }
-  });
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw Error(d.error || `Request failed (${r.status})`);
-  return d;
-}
-
-function statusEl(id, text, type = '') {
-  const el = $(id);
-  el.textContent = text;
-  el.className = 'status ' + type;
-  el.classList.remove('hidden');
-}
-
-function escapeHtml(s) {
-  return String(s || '').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
-}
-
-function pinUrl(p) {
-  if (p.image && (p.image.startsWith('http') || p.image.startsWith('/'))) return p.image;
-  if (p.slug) return `/images/pins/pin-${p.slug}.jpg`;
-  return '';
-}
-
-async function start() {
-  try {
-    const s = await api('/api/admin/session');
-    if (s.authenticated) showDashboard();
-  } catch (err) {
-    const st = $('#loginStatus');
-    if (st) { st.textContent = err.message; st.className = 'status error'; }
-  }
+  document.getElementById('loginForm').onsubmit = async (e) => {
+    e.preventDefault();
+    statusEl('loginStatus', 'Signing in…');
+    try {
+      await api('/api/admin/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          identifier: document.getElementById('identifier').value,
+          password: document.getElementById('password').value
+        })
+      });
+      const s = await api('/api/admin/session');
+      if (!s.authenticated) throw Error('Login succeeded but session cookie was not accepted.');
+      showDashboard();
+    } catch (err) {
+      statusEl('loginStatus', err.message, 'error');
+    }
+  };
 }
 
 function showDashboard() {
-  document.querySelector('#app').innerHTML = `
+  document.getElementById('app').innerHTML = `
     <div class="top">
       <div class="brand"><span class="brand-mark">S</span><span>Sara Rain · Admin</span></div>
       <button class="btn" id="logout">Log out</button>
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-tab="publish">Publish</button>
-      <button class="tab" data-tab="manage">Manage pins</button>
+      <button type="button" class="tab active" data-tab="publish">Publish</button>
+      <button type="button" class="tab" data-tab="manage">Manage pins</button>
     </div>
 
     <div id="tab-publish">
@@ -256,7 +270,7 @@ function showDashboard() {
             <p class="hint">Needs a <title> or <h1>. The first image is replaced with your uploaded pin.</p>
           </div>
 
-          <button id="publishBtn" class="btn btn-primary">Publish tutorial</button>
+          <button id="publishBtn" class="btn btn-primary" type="submit">Publish tutorial</button>
           <div id="status" class="status hidden"></div>
         </form>
       </div>
@@ -266,96 +280,115 @@ function showDashboard() {
       <div class="panel">
         <div class="kicker">Library</div>
         <h2>Published pins</h2>
-        <p class="muted">Edit details or remove a tutorial from the catalog.</p>
+        <p class="muted">All tutorials currently in the catalog. Delete removes them from the homepage catalog.</p>
         <div id="postList" class="post-list">Loading…</div>
         <div id="manageStatus" class="status hidden"></div>
       </div>
     </div>
   `;
 
-  $('#logout').onclick = async () => {
+  document.getElementById('logout').onclick = async () => {
     await api('/api/admin/logout', { method: 'POST', body: '{}' });
     location.reload();
   };
 
-  $$('.tab').forEach(t => t.onclick = () => {
-    $$('.tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    $('#tab-publish').classList.toggle('hidden', t.dataset.tab !== 'publish');
-    $('#tab-manage').classList.toggle('hidden', t.dataset.tab !== 'manage');
-    if (t.dataset.tab === 'manage') loadPosts();
+  $$('.tab').forEach((t) => {
+    t.onclick = () => {
+      const name = t.getAttribute('data-tab');
+      $$('.tab').forEach((x) => x.classList.remove('active'));
+      t.classList.add('active');
+
+      const publish = document.getElementById('tab-publish');
+      const manage = document.getElementById('tab-manage');
+      if (publish) publish.classList.toggle('hidden', name !== 'publish');
+      if (manage) manage.classList.toggle('hidden', name !== 'manage');
+
+      if (name === 'manage') loadPosts();
+    };
   });
 
-  $('#image').onchange = () => {
-    const f = $('#image').files[0];
-    if (!f) return;
-    if (f.size > 4 * 1024 * 1024) {
-      statusEl('#status', 'Please keep the image under 4 MB.', 'error');
-      $('#image').value = '';
-      return;
-    }
-    const r = new FileReader();
-    r.onload = () => {
-      imageData = r.result;
-      $('#preview').src = imageData;
-      $('#preview').style.display = 'block';
+  const imageInput = document.getElementById('image');
+  if (imageInput) {
+    imageInput.onchange = () => {
+      const f = imageInput.files && imageInput.files[0];
+      if (!f) return;
+      if (f.size > 4 * 1024 * 1024) {
+        statusEl('status', 'Please keep the image under 4 MB.', 'error');
+        imageInput.value = '';
+        return;
+      }
+      const r = new FileReader();
+      r.onload = () => {
+        imageData = r.result;
+        const prev = document.getElementById('preview');
+        if (prev) {
+          prev.src = imageData;
+          prev.style.display = 'block';
+        }
+      };
+      r.readAsDataURL(f);
     };
-    r.readAsDataURL(f);
-  };
+  }
 
-  $('#postForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = $('#publishBtn');
-    statusEl('#status', 'Publishing…');
-    btn.disabled = true;
-    try {
-      const d = await api('/api/admin/publish-html', {
-        method: 'POST',
-        body: JSON.stringify({
-          html: $('#html').value,
-          imageDataUrl: imageData
-        })
-      });
-      statusEl('#status', 'Published! ' + d.url, 'success');
-      $('#postForm').reset();
-      $('#preview').style.display = 'none';
-      imageData = '';
-    } catch (err) {
-      statusEl('#status', err.message, 'error');
-    } finally {
-      btn.disabled = false;
-    }
-  };
+  const form = document.getElementById('postForm');
+  if (form) {
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('publishBtn');
+      statusEl('status', 'Publishing…');
+      if (btn) btn.disabled = true;
+      try {
+        const html = document.getElementById('html').value;
+        const d = await api('/api/admin/publish-html', {
+          method: 'POST',
+          body: JSON.stringify({ html, imageDataUrl: imageData })
+        });
+        statusEl('status', 'Published! ' + d.url, 'success');
+        form.reset();
+        const prev = document.getElementById('preview');
+        if (prev) prev.style.display = 'none';
+        imageData = '';
+      } catch (err) {
+        statusEl('status', err.message, 'error');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+  }
 }
 
 async function loadPosts() {
-  const list = $('#postList');
+  const list = document.getElementById('postList');
+  if (!list) return;
   list.innerHTML = 'Loading…';
   try {
     postsCache = await api('/api/posts');
-    if (!postsCache.length) {
-      list.innerHTML = '<p class="muted">No published tutorials yet.</p>';
+    if (!Array.isArray(postsCache) || !postsCache.length) {
+      list.innerHTML = '<p class="muted">No published tutorials in the catalog yet.</p>';
       return;
     }
-    list.innerHTML = postsCache.map(p => {
+    list.innerHTML = postsCache.map((p) => {
       const img = pinUrl(p);
-      const bg = img ? `style="background-image:url('${img.replace(/'/g, "%27")}')"` : '';
+      const bg = img ? `style="background-image:url('${String(img).replace(/'/g, '%27')}')"` : '';
+      const slug = escapeHtml(p.slug || '');
+      const title = escapeHtml(p.title || p.slug || 'Untitled');
+      const cat = escapeHtml(p.category || 'Tutorial');
       return `
-      <div class="post-item" data-slug="${escapeHtml(p.slug)}">
+      <div class="post-item" data-slug="${slug}">
         <div class="thumb" ${bg}></div>
         <div>
-          <h3>${escapeHtml(p.title || p.slug)}</h3>
-          <p>${escapeHtml(p.category || 'Tutorial')} · /posts/${escapeHtml(p.slug)}.html</p>
+          <h3>${title}</h3>
+          <p>${cat} · /posts/${slug}.html</p>
         </div>
         <div class="post-actions">
-          <a class="btn" href="/posts/${escapeHtml(p.slug)}.html" target="_blank" rel="noopener">View</a>
-          <button class="btn btn-danger" data-delete="${escapeHtml(p.slug)}">Delete</button>
+          <a class="btn" href="/posts/${slug}.html" target="_blank" rel="noopener">View</a>
+          <button type="button" class="btn btn-danger" data-delete="${slug}">Delete</button>
         </div>
       </div>`;
     }).join('');
 
-    list.querySelectorAll('[data-delete]').forEach(btn => {
-      btn.onclick = () => deletePost(btn.dataset.delete);
+    list.querySelectorAll('[data-delete]').forEach((btn) => {
+      btn.onclick = () => deletePost(btn.getAttribute('data-delete'));
     });
   } catch (err) {
     list.innerHTML = `<p class="status error">${escapeHtml(err.message)}</p>`;
@@ -363,35 +396,27 @@ async function loadPosts() {
 }
 
 async function deletePost(slug) {
+  if (!slug) return;
   if (!confirm('Remove “' + slug + '” from the catalog?')) return;
   try {
-    statusEl('#manageStatus', 'Deleting…');
+    statusEl('manageStatus', 'Deleting…');
     await api('/api/admin/delete', { method: 'POST', body: JSON.stringify({ slug }) });
-    statusEl('#manageStatus', 'Deleted “' + slug + '”.', 'success');
+    statusEl('manageStatus', 'Deleted “' + slug + '”.', 'success');
     loadPosts();
   } catch (err) {
-    statusEl('#manageStatus', err.message, 'error');
+    statusEl('manageStatus', err.message, 'error');
   }
 }
 
-$('#loginForm').onsubmit = async e => {
-  e.preventDefault();
-  statusEl('#loginStatus', 'Signing in…');
+async function start() {
   try {
-    await api('/api/admin/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        identifier: $('#identifier').value,
-        password: $('#password').value
-      })
-    });
     const s = await api('/api/admin/session');
-    if (!s.authenticated) throw Error('Login succeeded but session cookie was not accepted.');
-    showDashboard();
-  } catch (err) {
-    statusEl('#loginStatus', err.message, 'error');
+    if (s.authenticated) showDashboard();
+    else showLogin();
+  } catch {
+    showLogin();
   }
-};
+}
 
 start();
 </script>
