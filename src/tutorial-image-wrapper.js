@@ -22,6 +22,10 @@ function removeSunglassesCards(html) {
   });
 }
 
+function renameBabyBlanketCard(html) {
+  return html.replace(/Easy Crochet Baby Blanket Pattern for Beginners\s*\|\s*Sara Rain Crochet/gi, 'Crochet Baby Blanket Pattern for Beginners');
+}
+
 function enhance(html, config) {
   if (html.includes('pinterest-grid')) html = removeSunglassesCards(html);
   if (html.includes('tutorial-process-gallery')) return html;
@@ -58,7 +62,7 @@ export default {
     headers.delete('ETag');
 
     if (isHome) {
-      return new Response(removeSunglassesCards(html), { status: response.status, statusText: response.statusText, headers });
+      return new Response(renameBabyBlanketCard(removeSunglassesCards(html)), { status: response.status, statusText: response.statusText, headers });
     }
 
     return new Response(enhance(html, config), { status: response.status, statusText: response.statusText, headers });
