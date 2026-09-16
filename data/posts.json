@@ -1,1 +1,320 @@
-PLACEHOLDER
+[
+  {
+    "slug": "crochet-cardigan-tutorial",
+    "title": "Crochet Cardigan Tutorial",
+    "description": "Learn how to crochet a cozy beginner-friendly cardigan with simple panels, sleeves, a button band, and easy finishing steps.",
+    "category": "Crochet tutorial",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-crochet-cardigan-tutorial.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-baby-blanket",
+    "title": "Crochet Baby Blanket",
+    "description": "A soft, beginner-friendly crochet baby blanket with a simple shell texture, gentle shaping, and a scalloped border.",
+    "category": "Home & gifts",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet.jpg",
+    "published": true,
+    "materials": "DK baby yarn, 5.5 mm hook, scissors, tapestry needle",
+    "intro": "Start with a soft washable yarn and a foundation width that feels useful rather than oversized.",
+    "steps": ["Choose a foundation chain for the desired width.", "Work the shell pattern across each row.", "Continue until the desired length, then add a scalloped border."],
+    "checkpoint": "Check the width after every few rows.",
+    "troubleshooting": "If shells look crowded, loosen tension or use a larger hook.",
+    "finishing": "Weave in ends and shape the blanket flat if the yarn allows.",
+    "variations": "Try two neutral shades or a contrasting border.",
+    "care": "Wash and dry according to the yarn label."
+  },
+  {
+    "slug": "crochet-baby-booties",
+    "title": "Crochet Baby Booties",
+    "description": "A sweet beginner crochet baby booties tutorial using a small oval sole, shaped upper, toe decreases, and a simple tie.",
+    "category": "Baby & gifts",
+    "readTime": "10 min read",
+    "image": "/images/pins/pin-easy-crochet-baby-booties-pattern-for-beginners-sara-rain-crochet.jpg",
+    "published": true,
+    "materials": "Soft baby yarn, 3.5 mm hook, tapestry needle, scissors",
+    "intro": "Baby booties are small, but accurate counting matters.",
+    "steps": ["Begin with an oval sole.", "Build the upper and shape the toe.", "Finish the ankle and make the second bootie."],
+    "checkpoint": "Lay the two soles together before shaping the uppers.",
+    "troubleshooting": "If the sole curls, check stitch placement around the ends.",
+    "finishing": "Weave in ends inside the bootie.",
+    "variations": "Make a matching pair in two colors.",
+    "care": "Follow the yarn label for washing."
+  },
+  {
+    "slug": "crochet-beanie",
+    "title": "Crochet Beanie for Beginners",
+    "description": "Make a cozy beginner beanie with a simple round crown, even body, and optional pom-pom finish.",
+    "category": "Wearables",
+    "readTime": "14 min read",
+    "image": "/images/pins/pin-crochet-beanie-for-beginners-sara-rain-crochet.jpg",
+    "published": true,
+    "materials": "Worsted yarn, 6 mm hook, stitch markers, scissors",
+    "intro": "A beanie is a useful first wearable because small changes in hook size and tension are easy to see.",
+    "steps": ["Start at the crown and increase evenly.", "Work the body without increases.", "Finish with a firm edge and optional pom-pom."],
+    "checkpoint": "Measure the crown flat without stretching it.",
+    "troubleshooting": "If the crown becomes wavy, there are too many increases.",
+    "finishing": "Weave the tail through several stitches.",
+    "variations": "Use stripes or a folded brim.",
+    "care": "Wash according to the yarn label."
+  },
+  {
+    "slug": "crochet-bookmark",
+    "title": "Crochet Bookmark",
+    "description": "A slim crochet bookmark with a delicate lace section, tassel, blocking, and gift-ready finishing.",
+    "category": "Small gifts",
+    "readTime": "8 min read",
+    "image": "/images/pins/pin-crochet-bookmark-tutorial-sara-rain-crochet.jpg",
+    "published": true,
+    "materials": "Thin cotton yarn, 3 mm hook, scissors, yarn needle",
+    "intro": "A bookmark is a great scrap-yarn project.",
+    "steps": ["Chain to the length you want.", "Work a narrow lace-style stitch pattern.", "Finish with a small tassel and block flat."],
+    "checkpoint": "Check the length inside a book before finishing.",
+    "troubleshooting": "If the edges wave, reduce tension changes.",
+    "finishing": "Trim the tassel evenly and block if the yarn permits.",
+    "variations": "Try a contrast tassel or a tiny flower.",
+    "care": "Keep it dry and wash gently if the fiber allows."
+  },
+  {
+    "slug": "crochet-bucket-hat",
+    "title": "Crochet Bucket Hat",
+    "description": "A beginner bucket hat with a rounded crown, straight side depth, widening brim, and optional structured edge.",
+    "category": "Wearables",
+    "readTime": "16 min read",
+    "image": "/images/pins/pin-crochet-bucket-hat.jpg",
+    "published": true,
+    "materials": "Bulky cotton yarn, 5.5 mm hook, stitch markers, measuring tape",
+    "intro": "Cotton is useful for a bucket hat because it gives the fabric enough structure to hold the brim.",
+    "steps": ["Crochet the crown in rounds.", "Work the side section, then widen the brim.", "Finish with a final edge that stabilizes the shape."],
+    "checkpoint": "Check crown width before adding depth.",
+    "troubleshooting": "A wavy brim usually means increases were added too quickly.",
+    "finishing": "Weave in ends and lightly shape if the cotton allows.",
+    "variations": "Add stripes or a contrast brim.",
+    "care": "Spot clean or wash according to the yarn label."
+  },
+  {
+    "slug": "crochet-cardigan",
+    "title": "Crochet Cardigan",
+    "description": "A beginner-friendly cardigan construction using a back panel, two front panels, simple sleeves, and a button band.",
+    "category": "Wearables",
+    "readTime": "20 min read",
+    "image": "/images/pins/pin-crochet-cardigan-tutorial.jpg",
+    "published": true,
+    "materials": "Worsted yarn, 5.5 mm hook, scissors, tapestry needle, buttons",
+    "intro": "A simple panel construction makes a cardigan easier to adjust.",
+    "steps": ["Make the back panel first, then two front panels.", "Work and attach sleeves.", "Add a button band and finish with buttons."],
+    "checkpoint": "Lay the front panels over the back before seaming.",
+    "troubleshooting": "If the cardigan pulls at the shoulders, recheck panel width.",
+    "finishing": "Block panels before assembly when the yarn allows.",
+    "variations": "Try a cropped length or contrast cuffs.",
+    "care": "Wash according to the yarn label and store flat."
+  },
+  {
+    "slug": "crochet-pencil-bag",
+    "title": "Crochet Pencil Bag",
+    "description": "A practical crochet pencil bag with a simple body, zipper or button closure options, and neat finishing.",
+    "category": "Accessories",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-crochet-pencil-bag.jpg",
+    "published": true
+  },
+  {
+    "slug": "granny-square",
+    "title": "Granny Square",
+    "description": "Classic granny square tutorial with clear rounds, color changes, and joining ideas.",
+    "category": "Crochet tutorial",
+    "readTime": "10 min read",
+    "image": "/images/pins/pin-granny-square.jpg",
+    "published": true
+  },
+  {
+    "slug": "first-crochet-project",
+    "title": "First Crochet Project",
+    "description": "A gentle starting project for absolute beginners.",
+    "category": "Beginner",
+    "readTime": "15 min read",
+    "image": "/images/pins/pin-first-crochet-project.jpg",
+    "published": true
+  },
+  {
+    "slug": "magic-ring-tutorial",
+    "title": "Magic Ring Tutorial",
+    "description": "Learn the magic ring for seamless starts in the round.",
+    "category": "Techniques",
+    "readTime": "8 min read",
+    "image": "/images/pins/pin-magic-ring-tutorial.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-flower",
+    "title": "Crochet Flower",
+    "description": "A simple crochet flower motif for applique and decoration.",
+    "category": "Motifs",
+    "readTime": "9 min read",
+    "image": "/images/pins/pin-crochet-flower.jpg",
+    "published": true
+  },
+  {
+    "slug": "amigurumi",
+    "title": "Amigurumi Basics",
+    "description": "Beginner-friendly amigurumi techniques and first shapes.",
+    "category": "Amigurumi",
+    "readTime": "18 min read",
+    "image": "/images/pins/pin-amigurumi.jpg",
+    "published": true
+  },
+  {
+    "slug": "yarn-guide",
+    "title": "Yarn Guide",
+    "description": "How to choose yarn weight, fiber, and care for crochet projects.",
+    "category": "Guides",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-yarn-guide.jpg",
+    "published": true
+  },
+  {
+    "slug": "how-to-read-crochet-patterns",
+    "title": "How to Read Crochet Patterns",
+    "description": "Decode abbreviations, repeats, and pattern structure with confidence.",
+    "category": "Guides",
+    "readTime": "14 min read",
+    "image": "/images/pins/pin-how-to-read-crochet-patterns.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-hook-sizes-guide",
+    "title": "Crochet Hook Sizes Guide",
+    "description": "Understand metric and letter hook sizes and when to change them.",
+    "category": "Guides",
+    "readTime": "10 min read",
+    "image": "/images/pins/pin-crochet-hook-sizes-guide.jpg",
+    "published": true
+  },
+  {
+    "slug": "how-to-crochet-in-the-round",
+    "title": "How to Crochet in the Round",
+    "description": "Work seamless circles and tubes for hats, amigurumi, and more.",
+    "category": "Techniques",
+    "readTime": "11 min read",
+    "image": "/images/pins/pin-how-to-crochet-in-the-round.jpg",
+    "published": true
+  },
+  {
+    "slug": "single-vs-double-crochet",
+    "title": "Single vs Double Crochet",
+    "description": "Compare height, fabric density, and best uses for SC and DC.",
+    "category": "Techniques",
+    "readTime": "9 min read",
+    "image": "/images/pins/pin-single-vs-double-crochet.jpg",
+    "published": true
+  },
+  {
+    "slug": "how-to-block-crochet",
+    "title": "How to Block Crochet",
+    "description": "Shape finished projects with wet or steam blocking.",
+    "category": "Finishing",
+    "readTime": "10 min read",
+    "image": "/images/pins/pin-how-to-block-crochet.jpg",
+    "published": true
+  },
+  {
+    "slug": "how-to-join-yarn",
+    "title": "How to Join Yarn",
+    "description": "Clean methods for changing colors and starting a new ball.",
+    "category": "Techniques",
+    "readTime": "8 min read",
+    "image": "/images/pins/pin-how-to-join-yarn.jpg",
+    "published": true
+  },
+  {
+    "slug": "how-to-fix-crochet-mistakes",
+    "title": "How to Fix Crochet Mistakes",
+    "description": "Rip back safely, fix missed stitches, and rescue uneven edges.",
+    "category": "Techniques",
+    "readTime": "11 min read",
+    "image": "/images/pins/pin-how-to-fix-crochet-mistakes.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-tension-guide",
+    "title": "Crochet Tension Guide",
+    "description": "Dial in consistent tension for better fit and fabric drape.",
+    "category": "Guides",
+    "readTime": "10 min read",
+    "image": "/images/pins/pin-crochet-tension-guide.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-stitch-abbreviations",
+    "title": "Crochet Stitch Abbreviations",
+    "description": "A practical reference for common US crochet abbreviations.",
+    "category": "Guides",
+    "readTime": "7 min read",
+    "image": "/images/pins/pin-crochet-stitch-abbreviations.jpg",
+    "published": true
+  },
+  {
+    "slug": "c2c-crochet-guide",
+    "title": "C2C Crochet Guide",
+    "description": "Corner-to-corner basics for blankets, graphs, and colorwork.",
+    "category": "Techniques",
+    "readTime": "13 min read",
+    "image": "/images/pins/pin-c2c-crochet-guide.jpg",
+    "published": true
+  },
+  {
+    "slug": "best-yarn-for-amigurumi",
+    "title": "Best Yarn for Amigurumi",
+    "description": "Choose fibers and weights that hold shape for stuffed toys.",
+    "category": "Amigurumi",
+    "readTime": "9 min read",
+    "image": "/images/pins/pin-best-yarn-for-amigurumi.jpg",
+    "published": true
+  },
+  {
+    "slug": "how-to-crochet-a-scarf",
+    "title": "How to Crochet a Scarf",
+    "description": "A straightforward scarf pattern path for beginners.",
+    "category": "Wearables",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-how-to-crochet-a-scarf.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-market-bag",
+    "title": "Crochet Market Bag",
+    "description": "Openwork market bag with sturdy handles and expandable body.",
+    "category": "Bags",
+    "readTime": "15 min read",
+    "image": "/images/pins/pin-crochet-market-bag.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-coasters-pattern",
+    "title": "Crochet Coasters Pattern",
+    "description": "Quick cotton coasters with a clean edge and gift-ready finish.",
+    "category": "Home",
+    "readTime": "8 min read",
+    "image": "/images/pins/pin-crochet-coasters-pattern.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-gift-ideas",
+    "title": "Crochet Gift Ideas",
+    "description": "Practical project ideas for handmade gifts at every skill level.",
+    "category": "Inspiration",
+    "readTime": "10 min read",
+    "image": "/images/pins/pin-crochet-gift-ideas.jpg",
+    "published": true
+  },
+  {
+    "slug": "seasonal-crochet-projects",
+    "title": "Seasonal Crochet Projects",
+    "description": "Ideas for spring, summer, autumn, and winter makes.",
+    "category": "Inspiration",
+    "readTime": "11 min read",
+    "image": "/images/pins/pin-seasonal-crochet-projects.jpg",
+    "published": true
+  }
+]
