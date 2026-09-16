@@ -1,6 +1,7 @@
 import baseWorker from './worker-v2.js';
 
 const REMOVED_SLUG = 'crochet-sunglasses-case';
+const GOOGLE_VERIFY = 'eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o';
 
 const TUTORIALS = {
   'easy-crochet-baby-booties-pattern-for-beginners-sara-rain-crochet': ['baby-booties', ['01-baby-booties-materials.jpg','02-baby-booties-start-sole.jpg','03-baby-booties-sole-rounds.jpg','04-baby-booties-toe.jpg','05-baby-booties-sides.jpg','06-baby-booties-cuff.jpg','07-baby-booties-finishing.jpg','08-baby-booties-finished.jpg'], ['Materials & Yarn','Starting the Sole','Building the Sole','Shaping the Toe','Crocheting the Sides','Creating the Cuff','Finishing & Weaving Ends','Finished Baby Booties']],
@@ -24,6 +25,14 @@ function removeSunglassesCards(html) {
 
 function renameBabyBlanketCard(html) {
   return html.replace(/Easy Crochet Baby Blanket Pattern for Beginners\s*\|\s*Sara Rain Crochet/gi, 'Crochet Baby Blanket Pattern for Beginners');
+}
+
+function addGoogleVerification(html) {
+  const tag = `<meta name="google-site-verification" content="${GOOGLE_VERIFY}" />`;
+  if (html.includes(`name="google-site-verification"`)) {
+    return html.replace(/<meta\s+name=["']google-site-verification["'][^>]*>/i, tag);
+  }
+  return html.replace(/<\/head>/i, `  ${tag}\n</head>`);
 }
 
 function enhance(html, config) {
@@ -62,7 +71,7 @@ export default {
     headers.delete('ETag');
 
     if (isHome) {
-      return new Response(renameBabyBlanketCard(removeSunglassesCards(html)), { status: response.status, statusText: response.statusText, headers });
+      return new Response(addGoogleVerification(renameBabyBlanketCard(removeSunglassesCards(html))), { status: response.status, statusText: response.statusText, headers });
     }
 
     return new Response(enhance(html, config), { status: response.status, statusText: response.statusText, headers });
