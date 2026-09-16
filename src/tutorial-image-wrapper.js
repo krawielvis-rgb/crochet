@@ -77,3 +77,5 @@ export default {
     return new Response(enhance(html, config), { status: response.status, statusText: response.statusText, headers });
   }
 };
+
+// Deployment trigger: 2026-09-16
