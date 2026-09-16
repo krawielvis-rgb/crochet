@@ -96,7 +96,7 @@
       box-shadow: 0 0 0 3px rgba(25,48,43,.08);
     }
     textarea {
-      min-height: 420px;
+      min-height: 480px;
       resize: vertical;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 13px;
@@ -163,25 +163,28 @@
   <div id="app" class="wrap"></div>
 
 <script>
-const $ = (s, root = document) => root.querySelector(s);
-const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+const $ = (s, root) => (root || document).querySelector(s);
+const $$ = (s, root) => Array.prototype.slice.call((root || document).querySelectorAll(s));
 
-let imageData = '';
-let postsCache = [];
+var imageData = '';
+var postsCache = [];
+var editingSlug = null;
 
-async function api(path, opt = {}) {
-  const r = await fetch(path, {
-    ...opt,
+async function api(path, opt) {
+  opt = opt || {};
+  var r = await fetch(path, {
+    method: opt.method || 'GET',
     credentials: 'include',
-    headers: { 'content-type': 'application/json', ...(opt.headers || {}) }
+    headers: Object.assign({ 'content-type': 'application/json' }, opt.headers || {}),
+    body: opt.body
   });
-  const d = await r.json().catch(() => ({}));
+  var d = await r.json().catch(function () { return {}; });
   if (!r.ok) throw Error(d.error || ('Request failed (' + r.status + ')'));
   return d;
 }
 
 function statusEl(id, text, type) {
-  const el = document.getElementById(id);
+  var el = document.getElementById(id);
   if (!el) return;
   el.textContent = text;
   el.className = 'status' + (type ? (' ' + type) : '');
@@ -262,22 +265,23 @@ function showDashboard() {
     '</div>' +
     '<div id="tab-publish">' +
       '<div class="panel">' +
-        '<div class="kicker">Quick publish</div>' +
-        '<h1>Publish a tutorial</h1>' +
-        '<p class="muted">Upload the Pinterest pin and paste your finished HTML. Title, description, and URL are detected automatically. To edit an existing pin, open Manage and click Edit, then paste the updated HTML with the same title.</p>' +
+        '<div class="kicker">Quick publish / edit</div>' +
+        '<h1 id="publishHeading">Publish a tutorial</h1>' +
+        '<p class="muted">Upload a pin image (required for new posts) and paste or edit the full HTML. Click Edit on Manage to load existing HTML here.</p>' +
         '<form id="postForm">' +
           '<div class="upload field">' +
             '<label>1 · Pinterest pin</label>' +
-            '<input id="image" type="file" accept="image/jpeg,image/png,image/webp" required>' +
-            '<p class="hint">JPG, PNG, or WebP · max ~4 MB</p>' +
+            '<input id="image" type="file" accept="image/jpeg,image/png,image/webp">' +
+            '<p class="hint">JPG, PNG, or WebP · max ~4 MB. Optional when updating an existing post if you keep the same pin.</p>' +
             '<img id="preview" class="preview" alt="Preview">' +
           '</div>' +
           '<div class="field">' +
             '<label>2 · Tutorial HTML</label>' +
             '<textarea id="html" required placeholder="Paste the complete HTML tutorial here..."></textarea>' +
-            '<p class="hint">Needs a title tag or h1. The first image is replaced with your uploaded pin.</p>' +
+            '<p class="hint">Needs a title tag or h1. On publish, the first image can be replaced with your uploaded pin.</p>' +
           '</div>' +
           '<button id="publishBtn" class="btn btn-primary" type="submit">Publish tutorial</button>' +
+          '<button id="cancelEditBtn" class="btn hidden" type="button" style="margin-left:8px">Cancel edit</button>' +
           '<div id="status" class="status hidden"></div>' +
         '</form>' +
       '</div>' +
@@ -286,7 +290,7 @@ function showDashboard() {
       '<div class="panel">' +
         '<div class="kicker">Library</div>' +
         '<h2>Published pins</h2>' +
-        '<p class="muted">All tutorials currently in the catalog. Edit opens Publish so you can replace the HTML and pin image. Delete removes the entry from the homepage catalog.</p>' +
+        '<p class="muted">Edit loads the post HTML into the editor. Delete removes it from the homepage catalog.</p>' +
         '<div id="postList" class="post-list">Loading…</div>' +
         '<div id="manageStatus" class="status hidden"></div>' +
       '</div>' +
@@ -301,71 +305,86 @@ function showDashboard() {
     t.onclick = function () { switchTab(t.getAttribute('data-tab')); };
   });
 
-  var imageInput = document.getElementById('image');
-  if (imageInput) {
-    imageInput.onchange = function () {
-      var f = imageInput.files && imageInput.files[0];
-      if (!f) return;
-      if (f.size > 4 * 1024 * 1024) {
-        statusEl('status', 'Please keep the image under 4 MB.', 'error');
-        imageInput.value = '';
-        return;
-      }
-      var r = new FileReader();
-      r.onload = function () {
-        imageData = r.result;
-        var prev = document.getElementById('preview');
-        if (prev) {
-          prev.src = imageData;
-          prev.style.display = 'block';
-        }
-      };
-      r.readAsDataURL(f);
-    };
-  }
+  document.getElementById('cancelEditBtn').onclick = function () {
+    editingSlug = null;
+    document.getElementById('html').value = '';
+    document.getElementById('image').value = '';
+    imageData = '';
+    var prev = document.getElementById('preview');
+    if (prev) prev.style.display = 'none';
+    document.getElementById('publishBtn').textContent = 'Publish tutorial';
+    document.getElementById('publishHeading').textContent = 'Publish a tutorial';
+    document.getElementById('cancelEditBtn').classList.add('hidden');
+    statusEl('status', 'Edit cancelled.');
+  };
 
-  var form = document.getElementById('postForm');
-  if (form) {
-    form.onsubmit = async function (e) {
-      e.preventDefault();
-      var btn = document.getElementById('publishBtn');
-      statusEl('status', 'Publishing…');
-      if (btn) btn.disabled = true;
-      try {
-        var html = document.getElementById('html').value;
-        var d = await api('/api/admin/publish-html', {
-          method: 'POST',
-          body: JSON.stringify({ html: html, imageDataUrl: imageData })
-        });
-        statusEl('status', 'Published! ' + d.url, 'success');
-        form.reset();
-        var prev = document.getElementById('preview');
-        if (prev) prev.style.display = 'none';
-        imageData = '';
-        if (btn) btn.textContent = 'Publish tutorial';
-      } catch (err) {
-        statusEl('status', err.message, 'error');
-      } finally {
-        if (btn) btn.disabled = false;
+  var imageInput = document.getElementById('image');
+  imageInput.onchange = function () {
+    var f = imageInput.files && imageInput.files[0];
+    if (!f) return;
+    if (f.size > 4 * 1024 * 1024) {
+      statusEl('status', 'Please keep the image under 4 MB.', 'error');
+      imageInput.value = '';
+      return;
+    }
+    var r = new FileReader();
+    r.onload = function () {
+      imageData = r.result;
+      var prev = document.getElementById('preview');
+      if (prev) {
+        prev.src = imageData;
+        prev.style.display = 'block';
       }
     };
-  }
+    r.readAsDataURL(f);
+  };
+
+  document.getElementById('postForm').onsubmit = async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('publishBtn');
+    statusEl('status', editingSlug ? 'Updating…' : 'Publishing…');
+    btn.disabled = true;
+    try {
+      var html = document.getElementById('html').value;
+      var payload = { html: html, imageDataUrl: imageData || '' };
+      if (editingSlug) payload.slug = editingSlug;
+      var d = await api('/api/admin/publish-html', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      statusEl('status', (editingSlug ? 'Updated! ' : 'Published! ') + d.url, 'success');
+      document.getElementById('postForm').reset();
+      var prev = document.getElementById('preview');
+      if (prev) prev.style.display = 'none';
+      imageData = '';
+      editingSlug = null;
+      btn.textContent = 'Publish tutorial';
+      document.getElementById('publishHeading').textContent = 'Publish a tutorial';
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+    } catch (err) {
+      statusEl('status', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  };
 }
 
-function editPost(slug) {
-  var p = null;
-  for (var i = 0; i < postsCache.length; i++) {
-    if (postsCache[i].slug === slug) { p = postsCache[i]; break; }
-  }
+async function editPost(slug) {
   switchTab('publish');
-  var btn = document.getElementById('publishBtn');
-  if (btn) btn.textContent = 'Update tutorial';
-  statusEl(
-    'status',
-    'Editing “' + (p && p.title ? p.title : slug) + '”. Paste the updated full HTML and upload a pin image (same title will overwrite the existing post).',
-    ''
-  );
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  editingSlug = slug;
+  document.getElementById('publishHeading').textContent = 'Edit tutorial';
+  document.getElementById('publishBtn').textContent = 'Save changes';
+  document.getElementById('cancelEditBtn').classList.remove('hidden');
+  document.getElementById('html').value = '';
+  statusEl('status', 'Loading HTML for “' + slug + '”…');
+  try {
+    var d = await api('/api/admin/post-html?slug=' + encodeURIComponent(slug));
+    document.getElementById('html').value = d.html || '';
+    statusEl('status', 'Loaded HTML for “' + (d.title || slug) + '”. Edit the code below, optionally upload a new pin, then Save changes.');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    statusEl('status', err.message, 'error');
+  }
 }
 
 async function loadPosts() {
@@ -380,7 +399,7 @@ async function loadPosts() {
     }
     list.innerHTML = postsCache.map(function (p) {
       var img = pinUrl(p);
-      var bg = img ? ('style="background-image:url(\'' + String(img).replace(/'/g, '%27') + '\')"') : '';
+      var bg = img ? ('style="background-image:url(\'' + String(img).replace(/\'/g, '%27') + '\')"') : '';
       var slug = escapeHtml(p.slug || '');
       var title = escapeHtml(p.title || p.slug || 'Untitled');
       var cat = escapeHtml(p.category || 'Tutorial');
