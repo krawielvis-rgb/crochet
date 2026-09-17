@@ -103,13 +103,35 @@ function addHomepageCard(indexHtml,post){
   let html=removeHiddenCards(indexHtml);
   const gridStart=html.search(/<div\s+class=["']pinterest-grid["'][^>]*>/i);
   if(gridStart<0)return html;
+  const openEnd=html.indexOf('>',gridStart)+1;
   const gridClose=findGridClose(html,gridStart);
-  if(gridClose<0)return html;
+  if(openEnd<=0||gridClose<0)return html;
   const grid=html.slice(gridStart,gridClose);
   const cardSlug=String(post.slug||'').toLowerCase();
   const existingRe=new RegExp('href=["\\\']/posts/'+cardSlug.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\.html["\\\']','i');
   if(existingRe.test(grid))return html;
-  return html.slice(0,gridStart)+html.slice(gridStart,html.indexOf('>',gridStart)+1)+'\n      '+cardForPost(post)+html.slice(html.indexOf('>',gridStart)+1);
+  return html.slice(0,openEnd)+'\n      '+cardForPost(post)+html.slice(openEnd);
+}
+
+function addMissingMeta(html,title,description,url,image){
+  let h=html;
+  if(!/<title\b/i.test(h))h=h.replace(/<head\b[^>]*>/i,m=>m+`<title>${esc(title)} — Sara Rain Crochet</title>`);
+  if(!/<meta\b[^>]*name=["']description["']/i.test(h))h=h.replace(/<head\b[^>]*>/i,m=>m+`<meta name="description" content="${esc(description)}">`);
+  if(!/<link\b[^>]*rel=["']canonical["']/i.test(h))h=h.replace(/<head\b[^>]*>/i,m=>m+`<link rel="canonical" href="${url}">`);
+  if(!/property=["']og:image["']/i.test(h))h=h.replace(/<head\b[^>]*>/i,m=>m+`<meta property="og:image" content="https://sararaincrochet.com${image}">`);
+  return h;
+}
+
+function normalizeTutorialHeader(html,title,description){
+  const eyebrow='<div class="eyebrow">Sara Rain Crochet · Free Pattern</div>';
+  const lede=`<p class="lede">${esc(description)}</p>`;
+  let h=html;
+  h=h.replace(/<p\b[^>]*class=["']meta["'][^>]*>[\s\S]*?<\/p>/i,eyebrow);
+  h=h.replace(/<p\b[^>]*class=["']intro["'][^>]*>[\s\S]*?<\/p>/i,lede);
+  h=h.replace(/<p\b[^>]*class=["']dek["'][^>]*>[\s\S]*?<\/p>/i,lede);
+  if(!/<div\b[^>]*class=["'][^"']*eyebrow[^"']*["']/i.test(h))h=h.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i,`${eyebrow}$1`);
+  if(!/<p\b[^>]*class=["']lede["']/i.test(h))h=h.replace(/(<h1\b[^>]*>[\s\S]*?<\/h1>)/i,`$1${lede}`);
+  return h;
 }
 
 export async function publishSaraHtml(request,env){
@@ -128,9 +150,6 @@ export async function publishSaraHtml(request,env){
   const description=cleanText(descMatch&&descMatch[1])||`${title} — a step-by-step crochet tutorial from Sara Rain Crochet.`;
   const s=slug(d.slug||title);
   if(!s)return out({error:'Could not create a URL slug from the HTML title.'},400);
-  const imageExt=m?(m[1]==='png'?'png':m[1]==='webp'?'webp':'jpg'):null;
-  const image=m?`/images/pins/pin-${s}.${imageExt}`:'';
-  if(!image)return out({error:'Upload a JPG, PNG, or WebP Pinterest pin (required for new posts).'},400);
 
   const [postsFile,indexFile,ref]=await Promise.all([
     readGitHubText('data/posts.json',env),
@@ -142,6 +161,13 @@ export async function publishSaraHtml(request,env){
   let posts=JSON.parse(postsFile.text);
   if(!Array.isArray(posts))posts=[];
   const existing=posts.find(p=>p&&p.slug===s)||null;
+  const imageExt=m?(m[1]==='png'?'png':m[1]==='webp'?'webp':'jpg'):null;
+  const image=m?`/images/pins/pin-${s}.${imageExt}`:(existing&&existing.image)||'';
+  if(!image)return out({error:'Upload a JPG, PNG, or WebP Pinterest pin (required for new posts).'},400);
+  const url=`https://sararaincrochet.com/posts/${s}.html`;
+  html=addMissingMeta(html,title,description,url,image);
+  html=normalizeTutorialHeader(html,title,description);
+
   const post={slug:s,title,description,category:(existing&&existing.category)||'Crochet tutorial',readTime:(existing&&existing.readTime)||'12 min read',image,published:true};
   posts=posts.filter(p=>p&&p.slug!==s);
   posts.unshift(post);
