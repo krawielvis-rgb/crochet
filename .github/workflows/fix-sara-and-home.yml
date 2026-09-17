@@ -28,27 +28,20 @@ jobs:
                   raise SystemExit(f'Expected homepage card not found: {slug}')
           p.write_text(s)
 
-          # Remove the app-level 900 KB HTML limit.
+          # Remove the app-level 900 KB HTML limit if it is still present.
           p = Path('src/worker-v2.js')
           s = p.read_text()
-          old = "if(html.length>900000)return out({error:'HTML is too large. Keep the pasted page under 900 KB.'},400);"
-          if old in s:
-              s = s.replace(old, '', 1)
-          else:
-              old2 = "if(html.length>900000)\n    return out({error:'HTML is too large. Keep the pasted page under 900 KB.'},400);"
-              if old2 in s:
-                  s = s.replace(old2, '', 1)
-              else:
-                  raise SystemExit('900 KB HTML limit not found')
+          s = s.replace("if(html.length>900000)return out({error:'HTML is too large. Keep the pasted page under 900 KB.'},400);", '', 1)
+          s = s.replace("if(html.length>900000)\n    return out({error:'HTML is too large. Keep the pasted page under 900 KB.'},400);", '', 1)
 
           # The HTML publisher was saving the uploaded image but never inserting
           # its public URL into the pasted HTML body. Insert it before metadata
-          # normalization so the uploaded pin is actually visible on the post.
+          # normalization so the uploaded pin is visible on the published post.
           marker = '  html=addMissingMeta(html,title,description,url,image);'
           if marker not in s:
               raise SystemExit('publishHtml metadata marker not found')
-          replacement = '  if(m) html=replacePinImage(html,image,title);\n' + marker
-          s = s.replace(marker, replacement, 1)
+          if 'if(m) html=replacePinImage(html,image,title);' not in s:
+              s = s.replace(marker, '  if(m) html=replacePinImage(html,image,title);\n' + marker, 1)
           p.write_text(s)
 
           # Remove old one-time size-limit workflows left in the repository.
