@@ -59,7 +59,21 @@ function injectUploadedImage(html, image, title) {
   if (html.includes('{{PIN_IMAGE}}')) return html.replaceAll('{{PIN_IMAGE}}', image);
   const safeTitle = String(title || 'Crochet tutorial').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const tag = `<img src="${image}" alt="${safeTitle} crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">`;
-  if (/<main\b[^>]*>/i.test(html)) return html.replace(/<main\b[^>]*>/i, match => match + tag);
+
+  // Preferred layout: tutorial title first, then the uploaded Pinterest image.
+  const mainMatch = html.match(/<main\b[^>]*>[\s\S]*?<\/main>/i);
+  if (mainMatch) {
+    const main = mainMatch[0];
+    const h1Match = main.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+    if (h1Match) {
+      const updatedMain = main.replace(h1Match[0], h1Match[0] + tag);
+      return html.replace(main, updatedMain);
+    }
+    return html.replace(mainMatch[0], mainMatch[0].replace(/(<main\b[^>]*>)/i, '$1' + tag));
+  }
+
+  const h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+  if (h1Match) return html.replace(h1Match[0], h1Match[0] + tag);
   if (/<body\b[^>]*>/i.test(html)) return html.replace(/<body\b[^>]*>/i, match => match + tag);
   return tag + html;
 }
