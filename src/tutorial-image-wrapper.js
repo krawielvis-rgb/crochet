@@ -1,4 +1,5 @@
 import baseWorker from './worker-v2.js';
+import { publishSaraHtml } from './sara-publisher.js';
 
 const REMOVED_SLUG = 'crochet-sunglasses-case';
 const GOOGLE_VERIFY = 'eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o';
@@ -48,6 +49,11 @@ function enhance(html, config) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (url.pathname === '/api/admin/publish-html' && request.method === 'POST') {
+      return publishSaraHtml(request, env);
+    }
+
     const slug = url.pathname.replace(/^\/posts\//, '').replace(/\.html$/, '').replace(/\/$/, '');
 
     if (slug === REMOVED_SLUG) {
