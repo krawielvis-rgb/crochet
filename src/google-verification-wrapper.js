@@ -33,7 +33,9 @@ function filterHomepageCards(html) {
   for (const hiddenSlug of HIDDEN_HOME_SLUGS) {
     const escaped = hiddenSlug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const cardRe = new RegExp(
-      `<a\\b[^>]*class=["'][^"']*pinterest-card[^"']*["'][^>]*href=["']/posts/${escaped}\\.html["'][^>]*>[\\s\\S]*?</a>`,
+      '<a\\b[^>]*class=["\'][^"\']*pinterest-card[^"\']*["\'][^>]*href=["\']/posts/' +
+        escaped +
+        '\\.html["\'][^>]*>[\\s\\S]*?</a>',
       'gi'
     );
     updated = updated.replace(cardRe, '');
@@ -60,20 +62,29 @@ function injectUploadedImage(html, image, title) {
     .replace(/</g, '<')
     .replace(/>/g, '>')
     .replace(/"/g, '"');
-  const tag = `<img src="${image}" alt="${safeTitle} crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">`;
-  const mainMatch = html.match(/<main\b[^>]*>[\s\S]*?<\/main>/i);
+  const tag =
+    '<img src="' +
+    image +
+    '" alt="' +
+    safeTitle +
+    ' crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">';
+  const mainRe = new RegExp('<main\\b[^>]*>[\\s\\S]*?</main>', 'i');
+  const mainMatch = html.match(mainRe);
   if (mainMatch) {
     const main = mainMatch[0];
-    const h1Match = main.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+    const h1Re = new RegExp('<h1\\b[^>]*>[\\s\\S]*?</h1>', 'i');
+    const h1Match = main.match(h1Re);
     if (h1Match) {
       const updatedMain = main.replace(h1Match[0], h1Match[0] + tag);
       return html.replace(main, updatedMain);
     }
-    return html.replace(mainMatch[0], mainMatch[0].replace(/(<main\b[^>]*>)/i, '$1' + tag));
+    return html.replace(mainMatch[0], mainMatch[0].replace(new RegExp('(<main\\b[^>]*>)', 'i'), '$1' + tag));
   }
-  const h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+  const h1Re = new RegExp('<h1\\b[^>]*>[\\s\\S]*?</h1>', 'i');
+  const h1Match = html.match(h1Re);
   if (h1Match) return html.replace(h1Match[0], h1Match[0] + tag);
-  if (/<body\b[^>]*>/i.test(html)) return html.replace(/<body\b[^>]*>/i, (match) => match + tag);
+  const bodyRe = new RegExp('<body\\b[^>]*>', 'i');
+  if (bodyRe.test(html)) return html.replace(bodyRe, (match) => match + tag);
   return tag + html;
 }
 
@@ -85,23 +96,19 @@ async function prepareSaraPublish(request) {
   if (!data || typeof data !== 'object') return request;
   const html = String(data.html || '');
   const imageDataUrl = String(data.imageDataUrl || '');
-  const titleMatch =
-    html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) ||
-    html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+  const titleRe = new RegExp('<title\\b[^>]*>([\\s\\S]*?)</title>', 'i');
+  const h1Re = new RegExp('<h1\\b[^>]*>([\\s\\S]*?)</h1>', 'i');
+  const titleMatch = html.match(titleRe) || html.match(h1Re);
   const title = String(
     titleMatch ? titleMatch[1].replace(/<[^>]+>/g, ' ').trim() : 'Crochet tutorial'
   );
   const imageMatch = imageDataUrl.match(/^data:image\/(jpeg|jpg|png|webp);base64,/i);
   if (imageMatch && html) {
-    const ext =
-      imageMatch[1].toLowerCase() === 'png'
-        ? 'png'
-        : imageMatch[1].toLowerCase() === 'webp'
-          ? 'webp'
-          : 'jpg';
+    const kind = imageMatch[1].toLowerCase();
+    const ext = kind === 'png' ? 'png' : kind === 'webp' ? 'webp' : 'jpg';
     const s = slugify(data.slug || title);
     if (s) {
-      const image = `/images/pins/pin-${s}.${ext}`;
+      const image = '/images/pins/pin-' + s + '.' + ext;
       data.html = injectUploadedImage(html, image, title);
     }
   }
@@ -139,10 +146,10 @@ export default {
     const hasAnalytics = homepageFiltered.includes(GA_ID);
     let updated = homepageFiltered;
     if (!hasVerification) {
-      updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GOOGLE_TAG}`);
+      updated = updated.replace(/<head([^>]*)>/i, '<head$1>\n  ' + GOOGLE_TAG);
     }
     if (!hasAnalytics) {
-      updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GA_TAG}`);
+      updated = updated.replace(/<head([^>]*)>/i, '<head$1>\n  ' + GA_TAG);
     }
     const headers = new Headers(response.headers);
     headers.delete('content-length');
