@@ -1,0 +1,47 @@
+name: Fix Sara image injection
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-sara-image-injection.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch publish image injection
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/worker-v2.js')
+          s=p.read_text()
+          old="""function replacePinImage(html,image,title){
+  if(html.includes('{{PIN_IMAGE}}'))return html.replaceAll('{{PIN_IMAGE}}',image);
+  const imgRe=/<img\\b([^>]*?)\\bsrc\\s*=\\s*(['\"])(.*?)\\2([^>]*)>/i;
+  if(imgRe.test(html))return html.replace(imgRe,(m,a,q,src,b)=>`<img${a}src=${q}${image}${q}${b}>`);
+  const tag=`<img src=\"${image}\" alt=\"${esc(title)} crochet tutorial\" style=\"max-width:100%;height:auto;display:block;margin:24px auto;\">`;
+  if(/<main\\b[^>]*>/i.test(html))return html.replace(/<main\\b[^>]*>/i,m=>m+tag);
+  if(/<body\\b[^>]*>/i.test(html))return html.replace(/<body\\b[^>]*>/i,m=>m+tag);
+  return tag+html;
+}"""
+          new="""function replacePinImage(html,image,title){
+  if(html.includes('{{PIN_IMAGE}}'))return html.replaceAll('{{PIN_IMAGE}}',image);
+  const tag=`<img src=\"${image}\" alt=\"${esc(title)} crochet tutorial\" style=\"max-width:100%;height:auto;display:block;margin:24px auto;\">`;
+  if(/<main\\b[^>]*>/i.test(html))return html.replace(/<main\\b[^>]*>/i,m=>m+tag);
+  if(/<body\\b[^>]*>/i.test(html))return html.replace(/<body\\b[^>]*>/i,m=>m+tag);
+  return tag+html;
+}"""
+          if old not in s:
+              raise SystemExit('Expected replacePinImage function not found')
+          p.write_text(s.replace(old,new,1))
+          PY
+      - name: Commit and remove temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/worker-v2.js
+          git commit -m 'Fix /sara uploaded image injection' || exit 0
+          git rm .github/workflows/fix-sara-image-injection.yml
+          git commit -m 'Remove temporary image injection workflow'
+          git push
