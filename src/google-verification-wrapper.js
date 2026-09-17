@@ -11,6 +11,7 @@ const GA_TAG = `<!-- Google tag (gtag.js) -->
   gtag('config', '${GA_ID}');
 </script>`;
 
+const RAW = 'https://raw.githubusercontent.com/krawielvis-rgb/crochet/main';
 const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://sararaincrochet.com/</loc></url>
@@ -24,22 +25,79 @@ const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
 
 const HIDDEN_HOME_SLUGS = new Set([
   'crochet-sunglasses-case',
-  'crochet-sunglasses-case-tutorial'
+  'crochet-sunglasses-case-tutorial',
+  'crochet-baby-blanket',
+  'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet'
 ]);
+
+const esc = (value) => String(value || '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
 
 function filterHomepageCards(html) {
   if (!html) return html;
   let updated = html;
   for (const hiddenSlug of HIDDEN_HOME_SLUGS) {
     const cardRe = new RegExp(
-      '<a[^>]*class=["\'][^"\']*pinterest-card[^"\']*["\'][^>]*href=["\']/posts/' +
+      '<a[^>]*class=["\\\'][^"\\\']*pinterest-card[^"\\\']*["\\\'][^>]*href=["\\\']/posts/' +
         hiddenSlug +
-        '\\.html["\'][^>]*>.*?</a>',
+        '\\\\.html["\\\'][^>]*>.*?</a>',
       'gis'
     );
     updated = updated.replace(cardRe, '');
   }
   return updated;
+}
+
+async function publishedPosts() {
+  try {
+    const response = await fetch(`${RAW}/data/posts.json?homepage=${Date.now()}`, {
+      headers: { 'cache-control': 'no-cache' }
+    });
+    if (!response.ok) return [];
+    const posts = await response.json();
+    if (!Array.isArray(posts)) return [];
+    return posts.filter((p) => {
+      if (!p || p.published === false || !p.slug) return false;
+      return !HIDDEN_HOME_SLUGS.has(String(p.slug).toLowerCase());
+    });
+  } catch {
+    return [];
+  }
+}
+
+function cardForPost(post) {
+  const slug = String(post.slug || '').trim();
+  const title = String(post.title || slug).trim();
+  const image = String(post.image || `/images/pins/pin-${slug}.jpg`).trim();
+  return `<a class="pinterest-card" href="/posts/${encodeURIComponent(slug)}.html"><img src="${esc(image)}" alt="${esc(title)}" loading="lazy"><div class="pinterest-card-content"><h3>${esc(title)}</h3><span>Read tutorial →</span></div></a>`;
+}
+
+async function ensureAutomaticHomepageCards(html) {
+  const posts = await publishedPosts();
+  if (!posts.length || !html) return filterHomepageCards(html);
+
+  let updated = filterHomepageCards(html);
+  const gridRe = /(<div\s+class=["']pinterest-grid["'][^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/section>)/i;
+  const match = updated.match(gridRe);
+  if (!match) return updated;
+
+  let gridContent = match[2];
+  const existingSlugs = new Set();
+  const hrefRe = /href=["']\/posts\/([^"']+)\.html["']/gi;
+  let hrefMatch;
+  while ((hrefMatch = hrefRe.exec(gridContent))) existingSlugs.add(decodeURIComponent(hrefMatch[1]).toLowerCase());
+
+  const missingCards = posts
+    .filter((post) => !existingSlugs.has(String(post.slug).toLowerCase()))
+    .map(cardForPost)
+    .join('\n');
+
+  if (!missingCards) return updated;
+  gridContent += `\n${missingCards}\n`;
+  return updated.replace(gridRe, `$1${gridContent}$3`);
 }
 
 function slugify(value) {
@@ -61,12 +119,7 @@ function injectUploadedImage(html, image, title) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-  const tag =
-    '<img src="' +
-    image +
-    '" alt="' +
-    safeTitle +
-    ' crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">';
+  const tag = '<img src="' + image + '" alt="' + safeTitle + ' crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">';
   const mainRe = new RegExp('<main[^>]*>.*?</main>', 'is');
   const mainMatch = html.match(mainRe);
   if (mainMatch) {
@@ -98,9 +151,7 @@ async function prepareSaraPublish(request) {
   const titleRe = new RegExp('<title[^>]*>(.*?)</title>', 'is');
   const h1Re = new RegExp('<h1[^>]*>(.*?)</h1>', 'is');
   const titleMatch = html.match(titleRe) || html.match(h1Re);
-  const title = String(
-    titleMatch ? titleMatch[1].replace(/<[^>]+>/g, ' ').trim() : 'Crochet tutorial'
-  );
+  const title = String(titleMatch ? titleMatch[1].replace(/<[^>]+>/g, ' ').trim() : 'Crochet tutorial');
   let imageMatch = null;
   const dataPrefix = 'data:image/';
   if (imageDataUrl.startsWith(dataPrefix)) {
@@ -146,15 +197,12 @@ export default {
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('text/html')) return response;
     const html = await response.text();
-    const homepageFiltered =
-      url.pathname === '/' || url.pathname === '/index.html'
-        ? filterHomepageCards(html)
-        : html;
-    const hasVerification = homepageFiltered.includes(
-      'eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o'
-    );
-    const hasAnalytics = homepageFiltered.includes(GA_ID);
-    let updated = homepageFiltered;
+    const homepageCards = url.pathname === '/' || url.pathname === '/index.html'
+      ? await ensureAutomaticHomepageCards(html)
+      : html;
+    const hasVerification = homepageCards.includes('eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o');
+    const hasAnalytics = homepageCards.includes(GA_ID);
+    let updated = homepageCards;
     if (!hasVerification) {
       updated = updated.replace(/<head([^>]*)>/i, '<head$1>' + String.fromCharCode(10) + '  ' + GOOGLE_TAG);
     }
