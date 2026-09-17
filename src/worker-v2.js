@@ -31,7 +31,6 @@ const IMAGE_BY_SLUG={
   'crochet-bookmark':'/images/pins/pin-crochet-bookmark-tutorial-sara-rain-crochet.jpg',
   'crochet-cardigan':'/images/pins/pin-crochet-cardigan-tutorial.jpg',
   'crochet-cardigan-tutorial':'/images/pins/pin-crochet-cardigan-tutorial.jpg',
-  'crochet-sunglasses-case':'/images/pins/pin-crochet-sunglasses-case-for-beginners.jpg',
   'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet':'/images/pins/pin-easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet.jpg',
   'easy-crochet-baby-booties-pattern-for-beginners-sara-rain-crochet':'/images/pins/pin-easy-crochet-baby-booties-pattern-for-beginners-sara-rain-crochet.jpg',
   'crochet-beanie-for-beginners-sara-rain-crochet':'/images/pins/pin-crochet-beanie-for-beginners-sara-rain-crochet.jpg',
@@ -47,7 +46,7 @@ function resolveImage(p){
 
 function page(d){const u=`https://sararaincrochet.com/posts/${d.slug}.html`,img=resolveImage(d);return `<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${esc(d.description)}"><meta name="author" content="Sara Rain Crochet"><meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="${u}"><meta property="og:title" content="${esc(d.title)} — Sara Rain Crochet"><meta property="og:description" content="${esc(d.description)}"><meta property="og:type" content="article"><meta property="og:url" content="${u}"><meta property="og:image" content="https://sararaincrochet.com${img}"><title>${esc(d.title)} — Sara Rain Crochet</title><style>body{margin:0;background:#f7f4ed;color:#21312c;font-family:Arial,sans-serif;line-height:1.7}.shell{max-width:1040px;margin:auto;padding:32px 22px 80px}.brand{color:#21312c;text-decoration:none;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}.hero,.card{background:#fff;border:1px solid #ded7ce;padding:28px}.hero{background:#efe9df}.hero img{display:block;width:100%;max-height:760px;object-fit:cover;margin-top:24px}.kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9b5148}h1,h2,h3{font-family:Georgia,serif;line-height:1.15}h1{font-size:clamp(38px,6vw,70px);font-weight:500}h2{font-size:34px}h3{font-size:24px}.lede{font-size:19px}.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 45px}.fact{background:#fff;border:1px solid #ded7ce;padding:18px}.fact b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#9b5148}.roadmap{background:#21312c;color:#f7f4ed;padding:28px;margin:45px 0}.check{border-left:4px solid #9b5148;padding:16px 20px;background:#f1ebe3}.note{background:#ead9cf;padding:20px}.back{display:inline-block;margin-top:30px;color:#9b5148;font-weight:700;text-decoration:none}footer{margin-top:65px;padding-top:24px;border-top:1px solid #d8d0c6;font-size:13px;color:#66716b}@media(max-width:700px){.facts{grid-template-columns:1fr}.shell{padding:22px 16px 60px}}</style><script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'Article',headline:d.title,description:d.description,image:[`https://sararaincrochet.com${img}`],mainEntityOfPage:{'@type':'WebPage','@id':u},author:{'@type':'Organization',name:'Sara Rain Crochet'},publisher:{'@type':'Organization',name:'Sara Rain Crochet'}})}</script></head><body><main class="shell"><a class="brand" href="/">Sara Rain Crochet</a><article><div class="hero"><div class="kicker">${esc(d.category||'Crochet tutorial')} · ${esc(d.readTime||'12 min read')}</div><h1>${esc(d.title)}</h1><p class="lede">${esc(d.description)}</p><img src="${img}" alt="${esc(d.title)} crochet tutorial"></div><div class="facts"><div class="fact"><b>Skill</b>Beginner friendly</div><div class="fact"><b>Project</b>${esc(d.title)}</div><div class="fact"><b>Approach</b>Measured, practical construction</div></div><section class="roadmap"><h2>Complete tutorial roadmap</h2><ol><li>Prepare yarn, hook, measurements, and workspace.</li><li>Build the main shape with consistent stitch counts.</li><li>Pause at checkpoints to compare size and symmetry.</li><li>Finish edges, joins, closures, or hardware carefully.</li><li>Block, wash, and store the finished project appropriately.</li></ol></section><section><h2>Materials & preparation</h2><div class="card">${paras(d.materials)||'<p>Gather your yarn, hook, scissors, and tapestry needle before you begin.</p>'}</div></section><section><h2>Core pattern / method</h2><div class="card">${paras(d.intro)}${d.steps?`<h3>Step-by-step</h3><ol>${lis(d.steps)}</ol>`:''}${!d.intro&&!d.steps&&d.rawContent?paras(d.rawContent):''}</div></section><section><h2>Checkpoint</h2><div class="check">${paras(d.checkpoint)||'<p>Pause and check stitch counts, edges, and overall shape before continuing.</p>'}</div></section><section><h2>Troubleshooting</h2><div class="card">${paras(d.troubleshooting)||'<p>If the fabric changes shape unexpectedly, count stitches, check tension, and compare your work with the previous successful section.</p>'}</div></section><section><h2>Finishing</h2><div class="card">${paras(d.finishing)||'<p>Weave in ends securely, shape the piece, and block if the yarn allows it.</p>'}</div></section><section><h2>Variations & next projects</h2><div class="card">${paras(d.variations)||'<p>Change color, yarn weight, or finished size once the base version feels comfortable.</p>'}</div></section><section><h2>Care & storage</h2><div class="note">${paras(d.care)||'<p>Follow the yarn label for washing and drying. Store finished items clean and completely dry.</p>'}</div></section><section><h2>Final notes</h2><p>Record your hook size, stitch count, and any adjustment that worked for your tension. Those notes make the next version easier and more consistent.</p></section></article><a class="back" href="/#pinterest-tutorials">← Back to tutorials</a><footer>© Sara Rain Crochet · Practical patterns and patient tutorials for modern makers.</footer></main></body></html>`}
 
-async function posts(e){const r=await fetch(`${RAW}/data/posts.json?x=${Date.now()}`);const remote=r.ok?await r.json():[];const map=new Map(freshPosts.map(p=>[p.slug,{...p}]));for(const p of remote){if(map.has(p.slug)){const base=map.get(p.slug);map.set(p.slug,{...base,...p,image:p.image||base.image})}else map.set(p.slug,p)}return [...map.values()].map(p=>({...p,image:resolveImage(p)}))}
+async function posts(e){const r=await fetch(`${RAW}/data/posts.json?x=${Date.now()}`);const remote=r.ok?await r.json():[];const map=new Map(freshPosts.map(p=>[p.slug,{...p}]));for(const p of remote){if(map.has(p.slug)){const base=map.get(p.slug);map.set(p.slug,{...base,...p,image:p.image||base.image})}else map.set(p.slug,p)}return [...map.values()].filter(p=>{if(!p||p.published===false)return false;const s=String(p.slug||'').toLowerCase()+' '+String(p.title||'').toLowerCase();if(s.includes('sunglass'))return false;return true;}).map(p=>({...p,image:resolveImage(p)}))}
 
 function replacePinImage(html,image,title){
   if(html.includes('{{PIN_IMAGE}}'))return html.replaceAll('{{PIN_IMAGE}}',image);
@@ -162,7 +161,6 @@ async function publishHtml(r,e){
   const d=await r.json().catch(()=>({}));
   let html=String(d.html||'').trim();
   if(!html)return out({error:'Paste your tutorial HTML first.'},400);
-  
   const m=String(d.imageDataUrl||'').match(/^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/);
   if(m&&m[2].length>5500000)return out({error:'Image is too large. Keep it under about 4 MB.'},400);
   const titleMatch=html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)||html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
@@ -232,13 +230,17 @@ export default{async fetch(r,e){
     const a=await e.ASSETS.fetch(r);if(!a.ok)return a;
     const ps=await posts(e);if(!ps.length)return a;let h=await a.text();
     const cards=ps.map(p=>`<a class="pinterest-card" href="/posts/${p.slug}.html"><img src="${p.image}" alt="${esc(p.title)}" loading="lazy"><div class="pinterest-card-content"><h3>${esc(p.title)}</h3><span>Read tutorial →</span></div></a>`).join('');
-    const sectionStart=h.indexOf('<section class="pinterest-section"');
-    const gridStart=sectionStart>=0?h.indexOf('<div class="pinterest-grid">',sectionStart):-1;
-    const gridEnd=gridStart>=0?h.indexOf('</div></div></section>',gridStart):-1;
-    if(gridStart>=0&&gridEnd>=0){
-      h=h.slice(0,gridStart)+`<div class="pinterest-grid">${cards}</div>`+h.slice(gridEnd+'</div>'.length);
+    const replaced=h.replace(/<div class="pinterest-grid">[\s\S]*?<\/div>\s*<\/div>\s*<\/section>/i,`<div class="pinterest-grid">${cards}</div></div></section>`);
+    if(replaced!==h){h=replaced;}
+    else {
+      const sectionStart=h.indexOf('<section class="pinterest-section"');
+      const gridStart=sectionStart>=0?h.indexOf('<div class="pinterest-grid">',sectionStart):-1;
+      const gridEnd=gridStart>=0?h.indexOf('</div></div></section>',gridStart):-1;
+      if(gridStart>=0&&gridEnd>=0){
+        h=h.slice(0,gridStart)+`<div class="pinterest-grid">${cards}</div>`+h.slice(gridEnd+'</div>'.length);
+      }
     }
-    return new Response(h,{headers:new Headers({...Object.fromEntries(a.headers),'cache-control':'no-store'})})
+    return new Response(h,{headers:new Headers({...Object.fromEntries(a.headers),'cache-control':'no-store, no-cache, must-revalidate'})})
   }
   if(u.pathname.startsWith('/posts/')){
     const sl=u.pathname.split('/').pop().replace(/\.html$/,'');const p=(await posts(e)).find(x=>x.slug===sl);
