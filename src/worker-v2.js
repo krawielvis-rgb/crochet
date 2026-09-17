@@ -162,7 +162,7 @@ async function publishHtml(r,e){
   const d=await r.json().catch(()=>({}));
   let html=String(d.html||'').trim();
   if(!html)return out({error:'Paste your tutorial HTML first.'},400);
-  if(html.length>900000)return out({error:'HTML is too large. Keep the pasted page under 900 KB.'},400);
+  
   const m=String(d.imageDataUrl||'').match(/^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/);
   if(m&&m[2].length>5500000)return out({error:'Image is too large. Keep it under about 4 MB.'},400);
   const titleMatch=html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)||html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
