@@ -76,28 +76,52 @@ function cardForPost(post) {
 }
 
 async function ensureAutomaticHomepageCards(html) {
+  if (!html) return html;
   const posts = await publishedPosts();
-  if (!posts.length || !html) return filterHomepageCards(html);
-
   let updated = filterHomepageCards(html);
-  const gridRe = /(<div\s+class=["']pinterest-grid["'][^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/section>)/i;
-  const match = updated.match(gridRe);
-  if (!match) return updated;
+  if (!posts.length) return updated;
 
-  let gridContent = match[2];
+  const gridStart = updated.search(/<div\s+class=["']pinterest-grid["'][^>]*>/i);
+  if (gridStart < 0) return updated;
+  const openEnd = updated.indexOf('>', gridStart) + 1;
+  if (openEnd <= 0) return updated;
+
+  // The catalog grid contains nested divs inside every card. Find its real closing tag
+  // instead of relying on a fragile regex that can stop at the wrong nested div.
+  let depth = 0;
+  let pos = gridStart;
+  const tagRe = /<\/?div\b[^>]*>/gi;
+  tagRe.lastIndex = gridStart;
+  let closingGrid = -1;
+  let match;
+  while ((match = tagRe.exec(updated))) {
+    if (match.index < gridStart) continue;
+    const token = match[0];
+    if (/^<div\b/i.test(token)) depth++;
+    else depth--;
+    if (depth === 0) {
+      closingGrid = match.index;
+      break;
+    }
+  }
+  if (closingGrid < 0) return updated;
+
+  const gridContent = updated.slice(openEnd, closingGrid);
   const existingSlugs = new Set();
   const hrefRe = /href=["']\/posts\/([^"']+)\.html["']/gi;
   let hrefMatch;
-  while ((hrefMatch = hrefRe.exec(gridContent))) existingSlugs.add(decodeURIComponent(hrefMatch[1]).toLowerCase());
+  while ((hrefMatch = hrefRe.exec(gridContent))) {
+    existingSlugs.add(decodeURIComponent(hrefMatch[1]).toLowerCase());
+  }
 
   const missingCards = posts
     .filter((post) => !existingSlugs.has(String(post.slug).toLowerCase()))
     .map(cardForPost)
+    .filter(Boolean)
     .join('\n');
 
   if (!missingCards) return updated;
-  gridContent += `\n${missingCards}\n`;
-  return updated.replace(gridRe, `$1${gridContent}$3`);
+  return updated.slice(0, closingGrid) + '\n' + missingCards + '\n' + updated.slice(closingGrid);
 }
 
 function slugify(value) {
