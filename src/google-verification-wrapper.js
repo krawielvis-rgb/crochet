@@ -26,6 +26,7 @@ const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
 const HIDDEN_HOME_SLUGS = new Set([
   'crochet-sunglasses-case',
   'crochet-sunglasses-case-tutorial',
+  'crochet-mug-cozy-tutorial',
   'crochet-baby-blanket',
   'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet'
 ]);
@@ -34,14 +35,14 @@ const esc = (value) => String(value || '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;');
+  .replace(/\"/g, '&quot;');
 
 function filterHomepageCards(html) {
   if (!html) return html;
   let updated = html;
   for (const hiddenSlug of HIDDEN_HOME_SLUGS) {
     const cardRe = new RegExp(
-      '<a[^>]*class=["\\\'][^"\\\']*pinterest-card[^"\\\']*["\\\'][^>]*href=["\\\']/posts/' +
+      '<a[^>]*class=["\\\'][^"\\\']*pinterest-card[^"\\\']["\\\'][^>]*href=["\\\']/posts/' +
         hiddenSlug +
         '\\\\.html["\\\'][^>]*>.*?</a>',
       'gis'
@@ -86,8 +87,6 @@ async function ensureAutomaticHomepageCards(html) {
   const openEnd = updated.indexOf('>', gridStart) + 1;
   if (openEnd <= 0) return updated;
 
-  // The catalog grid contains nested divs inside every card. Find its real closing tag
-  // instead of relying on a fragile regex that can stop at the wrong nested div.
   let depth = 0;
   let pos = gridStart;
   const tagRe = /<\/?div\b[^>]*>/gi;
@@ -142,7 +141,7 @@ function injectUploadedImage(html, image, title) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/\"/g, '&quot;');
   const tag = '<img src="' + image + '" alt="' + safeTitle + ' crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">';
   const mainRe = new RegExp('<main[^>]*>.*?</main>', 'is');
   const mainMatch = html.match(mainRe);
