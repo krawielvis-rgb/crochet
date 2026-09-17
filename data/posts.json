@@ -106,27 +106,6 @@
     "care": "Spot clean or wash according to the yarn label. Dry flat or reshape over a bowl if recommended."
   },
   {
-    "slug": "crochet-cardigan",
-    "title": "Crochet Cardigan",
-    "description": "A beginner-friendly cardigan construction using a back panel, two front panels, simple sleeves, and a button band.",
-    "category": "Wearables",
-    "readTime": "20 min read",
-    "image": "/images/pins/pin-crochet-cardigan-tutorial.jpg",
-    "published": true,
-    "materials": "Worsted yarn, 5.5 mm hook, scissors, tapestry needle, buttons",
-    "intro": "A simple panel construction makes a cardigan easier to adjust because each piece can be measured before assembly. Use the wearer’s chest and arm measurements rather than relying only on a generic size.",
-    "steps": [
-      "Make the back panel first, then crochet two matching front panels.",
-      "Work sleeves as rectangles or tapered pieces, seam them carefully, and attach them to the arm openings.",
-      "Add a button band along the fronts and finish with buttons."
-    ],
-    "checkpoint": "Lay the front panels over the back before seaming. Shoulder widths should match, and sleeve openings should be positioned symmetrically.",
-    "troubleshooting": "If the cardigan pulls at the shoulders, recheck panel width and seam allowance. If sleeves twist, mark the top center before attaching them. If the front edges ripple, reduce extra stitches in the button band.",
-    "finishing": "Block each panel before assembly when the yarn allows it. Sew buttons firmly and weave all ends between fabric layers.",
-    "variations": "Try a cropped length, longer sleeves, contrast cuffs, or a simple belt. The same panel method can become a vest by omitting sleeves.",
-    "care": "Wash according to the yarn label and store flat to protect the shoulders and button band."
-  },
-  {
     "slug": "crochet-crop-top",
     "title": "Crochet Crop Top",
     "description": "A simple cotton crochet crop top with measured panels, joined shoulders, side seams, and adjustable ties.",
@@ -429,6 +408,26 @@
     "finishing": "Weave in ends inside the sock and smooth the heel seam so it does not rub.",
     "variations": "Try ankle stripes, contrast cuffs, or a simple textured foot.",
     "care": "Wash according to the yarn label and dry flat when recommended."
+  },
+  {
+    "slug": "crochet-sunglasses-case",
+    "title": "Crochet Sunglasses Case",
+    "description": "A slim crochet glasses case with a rectangular body, button closure, and protective snug fit.",
+    "category": "Summer accessories",
+    "readTime": "10 min read",
+    "image": "/images/pins/pin-crochet-sunglasses-case-for-beginners.jpg",
+    "published": true,
+    "materials": "Cotton yarn, 4 mm hook, yarn needle, button",
+    "intro": "Measure the sunglasses including their widest points. The case should protect the glasses without forcing the frames into a tight opening.",
+    "steps": [
+      "Work a rectangle to the measured width, fold it into a sleeve, seam the sides, and add a flap with a button closure.",
+      "Test the glasses inside before trimming the final ends."
+    ],
+    "checkpoint": "Slide the glasses in and out several times. The opening should be easy to use while the closure keeps the case shut.",
+    "troubleshooting": "If the case is too tight, add width or use a larger hook. If the flap is too short, add rows before sewing the button.",
+    "finishing": "Reinforce the button and flap loop with extra stitches and weave the ends inside the seam area.",
+    "variations": "Add a contrast lining, a wrist loop, stripes, or a small flower.",
+    "care": "Keep the case dry and wash according to the yarn label."
   },
   {
     "slug": "crochet-table-runner",
