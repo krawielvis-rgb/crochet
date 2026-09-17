@@ -20,39 +20,11 @@ const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>https://sararaincrochet.com/terms.html</loc></url>
   <url><loc>https://sararaincrochet.com/contact.html</loc></url>
   <url><loc>https://sararaincrochet.com/pinterest-tutorials.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/first-crochet-project.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/granny-square.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/yarn-guide.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/amigurumi.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-flower.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/how-to-read-crochet-patterns.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/single-vs-double-crochet.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-hook-sizes-guide.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/how-to-fix-crochet-mistakes.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-blanket-for-beginners.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/magic-ring-tutorial.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-vs-knitting.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/best-yarn-for-amigurumi.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/how-to-crochet-in-the-round.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-stitch-abbreviations.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/how-to-crochet-a-scarf.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-gift-ideas.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/how-to-block-crochet.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-tension-guide.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/c2c-crochet-guide.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-coasters-pattern.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/how-to-join-yarn.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-vs-store-bought.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-market-bag.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/seasonal-crochet-projects.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-pencil-bag.html</loc></url>
-  <url><loc>https://sararaincrochet.com/posts/crochet-bag-charms.html</loc></url>
 </urlset>`;
 
 const HIDDEN_HOME_SLUGS = new Set([
   'crochet-sunglasses-case',
-  'crochet-baby-blanket',
-  'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet'
+  'crochet-sunglasses-case-tutorial'
 ]);
 
 function filterHomepageCards(html) {
@@ -74,21 +46,21 @@ function injectUploadedImage(html, image, title) {
   if (!html || !image) return html;
   if (html.includes(image)) return html;
   if (html.includes('{{PIN_IMAGE}}')) return html.replaceAll('{{PIN_IMAGE}}', image);
-  const safeTitle = String(title || 'Crochet tutorial').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
+  const safeTitle = String(title || 'Crochet tutorial').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/\"/g, '"');
   const tag = `<img src="${image}" alt="${safeTitle} crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">`;
-  const mainMatch = html.match(/<main\b[^>]*>[\s\S]*?<\/main>/i);
+  const mainMatch = html.match(/<main\\b[^>]*>[\\s\\S]*?<\\/main>/i);
   if (mainMatch) {
     const main = mainMatch[0];
-    const h1Match = main.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+    const h1Match = main.match(/<h1\\b[^>]*>[\\s\\S]*?<\\/h1>/i);
     if (h1Match) {
       const updatedMain = main.replace(h1Match[0], h1Match[0] + tag);
       return html.replace(main, updatedMain);
     }
-    return html.replace(mainMatch[0], mainMatch[0].replace(/(<main\b[^>]*>)/i, '$1' + tag));
+    return html.replace(mainMatch[0], mainMatch[0].replace(/(<main\\b[^>]*>)/i, '$1' + tag));
   }
-  const h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+  const h1Match = html.match(/<h1\\b[^>]*>[\\s\\S]*?<\\/h1>/i);
   if (h1Match) return html.replace(h1Match[0], h1Match[0] + tag);
-  if (/<body\b[^>]*>/i.test(html)) return html.replace(/<body\b[^>]*>/i, match => match + tag);
+  if (/<body\\b[^>]*>/i.test(html)) return html.replace(/<body\\b[^>]*>/i, match => match + tag);
   return tag + html;
 }
 
@@ -100,9 +72,9 @@ async function prepareSaraPublish(request) {
   if (!data || typeof data !== 'object') return request;
   const html = String(data.html || '');
   const imageDataUrl = String(data.imageDataUrl || '');
-  const titleMatch = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) || html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+  const titleMatch = html.match(/<title\\b[^>]*>([\\s\\S]*?)<\\/title>/i) || html.match(/<h1\\b[^>]*>([\\s\\S]*?)<\\/h1>/i);
   const title = String(titleMatch ? titleMatch[1].replace(/<[^>]+>/g, ' ').trim() : 'Crochet tutorial');
-  const imageMatch = imageDataUrl.match(/^data:image\/(jpeg|jpg|png|webp);base64,/i);
+  const imageMatch = imageDataUrl.match(/^data:image\\/(jpeg|jpg|png|webp);base64,/i);
   if (imageMatch && html) {
     const ext = imageMatch[1].toLowerCase() === 'png' ? 'png' : imageMatch[1].toLowerCase() === 'webp' ? 'webp' : 'jpg';
     const s = slugify(data.slug || title);
