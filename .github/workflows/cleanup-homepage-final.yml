@@ -1,0 +1,35 @@
+name: Final homepage cleanup
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove requested cards
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          for target in ('crochet-sunglasses-case.html','crochet-baby-blanket.html','easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet.html'):
+              pattern=r'\s*<a\b[^>]*href=["\'][^"\']*'+re.escape(target)+r'["\'][^>]*>.*?</a>'
+              s,n=re.subn(pattern,'',s,count=1,flags=re.S|re.I)
+              print(target,n)
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if ! git diff --cached --quiet; then git commit -m 'Remove sunglasses and baby blanket homepage cards'; git push; fi
+      - name: Remove this workflow
+        if: always()
+        run: |
+          git rm .github/workflows/cleanup-homepage-final.yml || true
+          if ! git diff --cached --quiet; then git commit -m 'Remove final homepage cleanup workflow'; git push || true; fi
