@@ -49,6 +49,51 @@ const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>https://sararaincrochet.com/posts/crochet-bag-charms.html</loc></url>
 </urlset>`;
 
+function slugify(value) {
+  return String(value || '').toLowerCase().trim().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+}
+
+function injectUploadedImage(html, image, title) {
+  if (!html || !image) return html;
+  if (html.includes(image)) return html;
+  if (html.includes('{{PIN_IMAGE}}')) return html.replaceAll('{{PIN_IMAGE}}', image);
+  const safeTitle = String(title || 'Crochet tutorial').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const tag = `<img src="${image}" alt="${safeTitle} crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">`;
+  if (/<main\b[^>]*>/i.test(html)) return html.replace(/<main\b[^>]*>/i, match => match + tag);
+  if (/<body\b[^>]*>/i.test(html)) return html.replace(/<body\b[^>]*>/i, match => match + tag);
+  return tag + html;
+}
+
+async function prepareSaraPublish(request) {
+  if (request.method !== 'POST') return request;
+  const url = new URL(request.url);
+  if (url.pathname !== '/api/admin/publish-html') return request;
+
+  const data = await request.json().catch(() => null);
+  if (!data || typeof data !== 'object') return request;
+
+  const html = String(data.html || '');
+  const imageDataUrl = String(data.imageDataUrl || '');
+  const titleMatch = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) || html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+  const title = String(titleMatch ? titleMatch[1].replace(/<[^>]+>/g, ' ').trim() : 'Crochet tutorial');
+  const imageMatch = imageDataUrl.match(/^data:image\/(jpeg|jpg|png|webp);base64,/i);
+
+  if (imageMatch && html) {
+    const ext = imageMatch[1].toLowerCase() === 'png' ? 'png' : imageMatch[1].toLowerCase() === 'webp' ? 'webp' : 'jpg';
+    const s = slugify(data.slug || title);
+    if (s) {
+      const image = `/images/pins/pin-${s}.${ext}`;
+      data.html = injectUploadedImage(html, image, title);
+    }
+  }
+
+  return new Request(request, {
+    method: 'POST',
+    headers: request.headers,
+    body: JSON.stringify(data)
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -63,7 +108,8 @@ export default {
       });
     }
 
-    const response = await tutorialWorker.fetch(request, env, ctx);
+    const preparedRequest = await prepareSaraPublish(request);
+    const response = await tutorialWorker.fetch(preparedRequest, env, ctx);
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('text/html')) return response;
 
@@ -72,23 +118,13 @@ export default {
     const hasAnalytics = html.includes(GA_ID);
 
     let updated = html;
-    if (!hasVerification) {
-      updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GOOGLE_TAG}`);
-    }
-    if (!hasAnalytics) {
-      updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GA_TAG}`);
-    }
-
+    if (!hasVerification) updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GOOGLE_TAG}`);
+    if (!hasAnalytics) updated = updated.replace(/<head([^>]*)>/i, `<head$1>\n  ${GA_TAG}`);
     if (updated === html) return new Response(html, response);
 
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-
-    return new Response(updated, {
-      status: response.status,
-      statusText: response.statusText,
-      headers
-    });
+    return new Response(updated, { status: response.status, statusText: response.statusText, headers });
   }
 };
