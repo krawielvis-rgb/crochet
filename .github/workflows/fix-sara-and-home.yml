@@ -1,0 +1,68 @@
+name: Fix Sara publisher and homepage
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          # Remove only the two requested homepage Pinterest cards.
+          p = Path('index.html')
+          s = p.read_text()
+          for slug in ('crochet-mug-cozy-tutorial', 'crochet-sunglasses-case'):
+              pattern = r'\s*<a class="pinterest-card" href="/posts/' + re.escape(slug) + r'\.html">[\s\S]*?</a>'
+              s, n = re.subn(pattern, '', s, count=1)
+              if n != 1:
+                  raise SystemExit(f'Expected homepage card not found: {slug}')
+          p.write_text(s)
+
+          # Remove the app-level 900 KB HTML limit.
+          p = Path('src/worker-v2.js')
+          s = p.read_text()
+          old = "if(html.length>900000)return out({error:'HTML is too large. Keep the pasted page under 900 KB.'},400);"
+          if old in s:
+              s = s.replace(old, '', 1)
+          else:
+              old2 = "if(html.length>900000)\n    return out({error:'HTML is too large. Keep the pasted page under 900 KB.'},400);"
+              if old2 in s:
+                  s = s.replace(old2, '', 1)
+              else:
+                  raise SystemExit('900 KB HTML limit not found')
+
+          # The HTML publisher was saving the uploaded image but never inserting
+          # its public URL into the pasted HTML body. Insert it before metadata
+          # normalization so the uploaded pin is actually visible on the post.
+          marker = '  html=addMissingMeta(html,title,description,url,image);'
+          if marker not in s:
+              raise SystemExit('publishHtml metadata marker not found')
+          replacement = '  if(m) html=replacePinImage(html,image,title);\n' + marker
+          s = s.replace(marker, replacement, 1)
+          p.write_text(s)
+
+          # Remove old one-time size-limit workflows left in the repository.
+          for f in (Path('.github/workflows/remove-publish-size-limit.yml'), Path('.github/workflows/remove-sara-size-limit.yml')):
+              if f.exists():
+                  f.unlink()
+          PY
+      - name: Commit fixes and remove this temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html src/worker-v2.js .github/workflows
+          git commit -m 'Fix Sara publisher image and remove homepage cards'
+          rm -f .github/workflows/fix-sara-and-home.yml
+          git add -u .github/workflows/fix-sara-and-home.yml
+          git commit -m 'Remove temporary fix workflow'
+          git push
