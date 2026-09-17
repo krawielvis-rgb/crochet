@@ -1,0 +1,39 @@
+name: Remove baby blanket homepage cards
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Remove both baby blanket cards
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('index.html')
+          s = p.read_text()
+          targets = [
+              'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet.html',
+              'crochet-baby-blanket.html',
+          ]
+          for target in targets:
+              pattern = r'\s*<a class="pinterest-card" href="[^"]*' + re.escape(target) + r'">.*?</a>'
+              s, n = re.subn(pattern, '', s, flags=re.S)
+              print(target, 'removed', n)
+          p.write_text(s)
+          PY
+          git add index.html
+          git commit -m "Remove baby blanket cards from homepage" || true
+          git push
+      - name: Delete temporary workflow
+        run: |
+          rm -f .github/workflows/remove-baby-blankets.yml
+          git add .github/workflows/remove-baby-blankets.yml
+          git commit -m "Remove temporary cleanup workflow" || true
+          git push
