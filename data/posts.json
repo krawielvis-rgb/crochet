@@ -1,5 +1,14 @@
 [
   {
+    "slug": "crochet-mug-cozy-tutorial",
+    "title": "Crochet Mug Cozy Tutorial",
+    "description": "Learn how to crochet a cute beginner-friendly mug cozy with simple stitches, button closure, and cozy texture. Perfect for coffee lovers and quick gifts.",
+    "category": "Crochet tutorial",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-crochet-mug-cozy-tutorial.jpg",
+    "published": true
+  },
+  {
     "slug": "crochet-baby-blanket",
     "title": "Crochet Baby Blanket",
     "description": "A soft, beginner-friendly crochet baby blanket with a simple shell texture, gentle shaping, and a scalloped border.",
@@ -104,6 +113,27 @@
     "finishing": "Weave in ends and steam or lightly shape only if the cotton care instructions permit it. A firm final round can help the brim keep its line.",
     "variations": "Add stripes, a contrast brim, a tiny flower, or a simple embroidered initial.",
     "care": "Spot clean or wash according to the yarn label. Dry flat or reshape over a bowl if recommended."
+  },
+  {
+    "slug": "crochet-cardigan",
+    "title": "Crochet Cardigan",
+    "description": "A beginner-friendly cardigan construction using a back panel, two front panels, simple sleeves, and a button band.",
+    "category": "Wearables",
+    "readTime": "20 min read",
+    "image": "/images/pins/pin-crochet-cardigan-tutorial.jpg",
+    "published": true,
+    "materials": "Worsted yarn, 5.5 mm hook, scissors, tapestry needle, buttons",
+    "intro": "A simple panel construction makes a cardigan easier to adjust because each piece can be measured before assembly. Use the wearer’s chest and arm measurements rather than relying only on a generic size.",
+    "steps": [
+      "Make the back panel first, then crochet two matching front panels.",
+      "Work sleeves as rectangles or tapered pieces, seam them carefully, and attach them to the arm openings.",
+      "Add a button band along the fronts and finish with buttons."
+    ],
+    "checkpoint": "Lay the front panels over the back before seaming. Shoulder widths should match, and sleeve openings should be positioned symmetrically.",
+    "troubleshooting": "If the cardigan pulls at the shoulders, recheck panel width and seam allowance. If sleeves twist, mark the top center before attaching them. If the front edges ripple, reduce extra stitches in the button band.",
+    "finishing": "Block each panel before assembly when the yarn allows it. Sew buttons firmly and weave all ends between fabric layers.",
+    "variations": "Try a cropped length, longer sleeves, contrast cuffs, or a simple belt. The same panel method can become a vest by omitting sleeves.",
+    "care": "Wash according to the yarn label and store flat to protect the shoulders and button band."
   },
   {
     "slug": "crochet-crop-top",
