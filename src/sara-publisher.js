@@ -3,6 +3,7 @@ const BRANCH='main';
 const API=`https://api.github.com/repos/${REPO}`;
 const HIDDEN_HOME_SLUGS=new Set([
   'crochet-sunglasses-case',
+  'react-artifact',
   'crochet-sunglasses-case-tutorial',
   'crochet-mug-cozy-tutorial',
   'crochet-baby-blanket',
