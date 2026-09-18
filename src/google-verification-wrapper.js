@@ -25,6 +25,7 @@ const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
 
 const HIDDEN_HOME_SLUGS = new Set([
   'crochet-sunglasses-case',
+  'react-artifact',
   'crochet-sunglasses-case-tutorial',
   'crochet-mug-cozy-tutorial',
   'crochet-baby-blanket',
