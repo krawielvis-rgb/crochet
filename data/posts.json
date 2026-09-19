@@ -225,37 +225,6 @@
     "published": true
   },
   {
-    "slug": "crochet-halloween-bat-tutorial-sara-rain-crochet",
-    "title": "Crochet Halloween Bat Tutorial | Sara Rain Crochet",
-    "description": "8-Step Tutorial Crochet a Cute Bat with Orange Wings Beginner Friendly - premium Halloween amigurumi pattern with step-by-step photos.",
-    "category": "Crochet tutorial",
-    "readTime": "12 min read",
-    "image": "/images/pins/pin-crochet-halloween-bat-tutorial-sara-rain-crochet.jpg",
-    "published": true
-  },
-  {
-    "slug": "crochet-baby-blanket",
-    "title": "Crochet Baby Blanket",
-    "description": "A soft, beginner-friendly crochet baby blanket with a simple shell texture, gentle shaping, and a scalloped border.",
-    "category": "Home & gifts",
-    "readTime": "12 min read",
-    "image": "/images/pins/pin-easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet.jpg",
-    "published": true,
-    "materials": "DK baby yarn, 5.5 mm hook, scissors, tapestry needle",
-    "intro": "Start with a soft washable yarn and a foundation width that feels useful rather than oversized. The sample method below uses a repeatable shell texture so the blanket grows predictably while staying relaxed and cozy.",
-    "steps": [
-      "Choose a foundation chain that gives the finished blanket the width you want, keeping the stitch repeat consistent.",
-      "Work the first setup row evenly, then build the shell pattern across each row.",
-      "Keep the first and last stitch easy to see with a marker.",
-      "Continue until the blanket reaches the desired length, then add a simple border and scalloped edge."
-    ],
-    "checkpoint": "Check the width after every few rows. The edges should remain parallel, and each shell should sit in the same rhythm as the row before it. If the fabric starts narrowing, count the first and last stitches before continuing.",
-    "troubleshooting": "If the shells look crowded, loosen your tension or use a slightly larger hook. If the fabric feels floppy and holes are larger than expected, tighten your tension or test a smaller hook. Always make a small swatch before committing to a large blanket.",
-    "finishing": "Weave in all ends securely on the back. Add the scalloped border slowly around the corners so the edge does not ruffle. Shape the blanket flat while damp only if the yarn label allows it.",
-    "variations": "Try two neutral shades, a soft striped sequence, or a single color with a contrasting border. The same shell rhythm also works for stroller blankets and lap blankets.",
-    "care": "Wash and dry according to the yarn label. Store the finished blanket folded loosely so the border keeps its shape."
-  },
-  {
     "slug": "crochet-bucket-hat",
     "title": "Crochet Bucket Hat",
     "description": "A beginner bucket hat with a rounded crown, straight side depth, widening brim, and optional structured edge.",
@@ -557,6 +526,15 @@
     "category": "Inspiration",
     "readTime": "11 min read",
     "image": "/images/pins/pin-seasonal-crochet-projects.jpg",
+    "published": true
+  },
+  {
+    "slug": "crochet-halloween-bat-tutorial",
+    "title": "Crochet Halloween Bat Tutorial",
+    "description": "8-Step Tutorial Crochet a Cute Bat with Orange Wings Beginner Friendly - premium Halloween amigurumi pattern with step-by-step photos.",
+    "category": "Crochet tutorial",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-crochet-halloween-bat-tutorial.jpg",
     "published": true
   }
 ]
