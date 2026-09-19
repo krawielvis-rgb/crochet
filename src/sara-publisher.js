@@ -3,11 +3,8 @@ const BRANCH='main';
 const API=`https://api.github.com/repos/${REPO}`;
 const HIDDEN_HOME_SLUGS=new Set([
   'crochet-sunglasses-case',
-  'react-artifact',
   'crochet-sunglasses-case-tutorial',
-  'crochet-mug-cozy-tutorial',
-  'crochet-baby-blanket',
-  'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet'
+  'react-artifact'
 ]);
 
 const JSON_HEADERS={'content-type':'application/json; charset=utf-8','cache-control':'no-store'};
@@ -17,7 +14,7 @@ const b64DecodeText=(value)=>{
   const bytes=Uint8Array.from(atob(clean),c=>c.charCodeAt(0));
   return new TextDecoder().decode(bytes);
 };
-const esc=x=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
+const esc=x=>String(x||'').replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
 const cleanText=x=>String(x||'').replace(/<[^>]+>/g,' ').replace(/&/g,'&').replace(/\s+/g,' ').trim();
 const slug=x=>String(x||'').toLowerCase().trim().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
 
@@ -94,7 +91,7 @@ function findGridClose(html,gridStart){
 function removeHiddenCards(html){
   let updated=html;
   for(const hidden of HIDDEN_HOME_SLUGS){
-    const re=new RegExp('<a\\b[^>]*class=["\\\'][^"\\\']*pinterest-card[^"\\\']["\\\'][^>]*href=["\\\']\\/posts\\/'+hidden+'\\.html["\\\'][^>]*>[\\s\\S]*?<\\/a>','gi');
+    const re=new RegExp('<a\\b[^>]*class=["\\\'][^"\\\']*pinterest-card[^"\\\']*["\\\'][^>]*href=["\\\']\\/posts\\/'+hidden+'\\.html["\\\'][^>]*>[\\s\\S]*?<\\/a>','gi');
     updated=updated.replace(re,'');
   }
   return updated;
