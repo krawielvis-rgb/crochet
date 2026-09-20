@@ -207,6 +207,12 @@ async function prepareSaraPublish(request) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Redirect only the Worker preview hostname. Do not modify site content.
+    if (url.hostname === "crochet.krawielvis.workers.dev" || url.hostname.endsWith(".workers.dev")) {
+      url.hostname = "sararaincrochet.com";
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
     if (url.pathname === '/sitemap.xml' || url.pathname === '/sitemaps.xml') {
       return new Response(SITEMAP, {
         status: 200,
@@ -221,9 +227,8 @@ export default {
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('text/html')) return response;
     const html = await response.text();
-    const homepageCards = url.pathname === '/' || url.pathname === '/index.html'
-      ? await ensureAutomaticHomepageCards(html)
-      : html;
+    // Serve the deployed homepage exactly as stored; do not add/remove/rewrite cards.
+    const homepageCards = html;
     const hasVerification = homepageCards.includes('eYCLA4SbSc8jRmc8bI729wq-QkDGAI2F5ctE3aKDy9o');
     const hasAnalytics = homepageCards.includes(GA_ID);
     let updated = homepageCards;
