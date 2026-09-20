@@ -207,6 +207,14 @@ async function prepareSaraPublish(request) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    // Redirect ONLY the built-in workers.dev hostname. Nothing else runs first.
+    if (url.hostname === "crochet.krawielvis.workers.dev") {
+      return Response.redirect(
+        "https://sararaincrochet.com" + url.pathname + url.search,
+        301
+      );
+    }
     if (url.pathname === '/sitemap.xml' || url.pathname === '/sitemaps.xml') {
       return new Response(SITEMAP, {
         status: 200,
