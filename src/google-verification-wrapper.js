@@ -133,6 +133,9 @@ function cardForPost(post) {
 
 async function ensureAutomaticHomepageCards(html) {
   if (!html) return html;
+  // Do not auto-add posts to the homepage. The homepage card list in index.html is authoritative.
+  return filterHomepageCards(html);
+  /*
   const posts = await publishedPosts();
   let updated = filterHomepageCards(html);
   if (!posts.length) return updated;
@@ -176,6 +179,7 @@ async function ensureAutomaticHomepageCards(html) {
 
   if (!missingCards) return updated;
   return updated.slice(0, closingGrid) + '\n' + missingCards + '\n' + updated.slice(closingGrid);
+  */
 }
 
 function slugify(value) {
