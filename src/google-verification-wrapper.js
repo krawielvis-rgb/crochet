@@ -207,6 +207,13 @@ async function prepareSaraPublish(request) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // --- Redirect old workers.dev traffic to the real domain ---
+    if (url.hostname === "crochet.krawielvis.workers.dev" || url.hostname.endsWith(".workers.dev")) {
+      url.hostname = "sararaincrochet.com";
+      url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
+    // --- end redirect ---
     if (url.pathname === '/sitemap.xml' || url.pathname === '/sitemaps.xml') {
       return new Response(SITEMAP, {
         status: 200,
