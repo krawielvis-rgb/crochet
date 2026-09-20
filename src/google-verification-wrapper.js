@@ -208,6 +208,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     // Redirect only the Worker preview hostname. Do not modify site content.
+    // Redirect is intentionally handled before sitemap, publishing, or HTML processing.
     if (url.hostname === "crochet.krawielvis.workers.dev" || url.hostname.endsWith(".workers.dev")) {
       url.hostname = "sararaincrochet.com";
       url.protocol = "https:";
