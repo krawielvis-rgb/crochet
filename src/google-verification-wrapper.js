@@ -27,80 +27,48 @@ const HIDDEN_HOME_SLUGS = new Set([
   'crochet-sunglasses-case',
   'react-artifact',
   'crochet-sunglasses-case-tutorial',
-  'crochet-mug-cozy-tutorial',
   'crochet-baby-blanket',
-  'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet',
-  'strawberry-granny-bandana-pink-and-white',
-  'granny-bandana-crochet-pattern-sage-and-cream-triangle-beginner-friendly',
-  'pumpkin-headphone-covers-fall-aesthetic-free-tutorial-beginner-friendly',
-  'free-halloween-wind-spinner-5-in-1-tutorial',
-  'cozy-halloween-beanie-gloves-pattern-quick-1-hour-make',
-  'free-halloween-hair-clips-crochet-pattern-8-spooky-clips',
-  'free-crochet-frog-witch-halloween-amigurumi',
-  'free-fox-crochet-pattern-my-little-woodland-fox',
-  'free-crochet-kitten-pattern-my-little-orange-kitty-beginner-friendly',
-  'free-crochet-capybara-pattern-brown-baby-capy-with-orange-cap-beginner-amigurumi',
-  'free-crochet-dinosaur-pattern-sage-green-baby-dino-with-yellow-spikes-beginner-a',
-  'free-winter-crochet-penguin-cute-amigurumi-and-easy-pattern-beginner-tutorial',
-  'free-fall-crochet-charms-bag-charms-and-keychains-ghost-bat-pumpkin-mushroom-lat',
-  'free-fall-crochet-mosaic-mosaic-squares-and-halloween-coasters-beginner',
-  'free-fall-crochet-flowers-3d-flowers-and-granny-squares-pouch-beginner-tutorial',
-  'free-fall-crochet-pumpkins-beginner-tutorial-with-pictures',
-  'free-mini-cat-keychains-low-sew-black-cat-with-bow',
-  'free-mini-ghost-keychains-low-sew-tiny-pumpkins-pattern',
-  'free-crochet-fall-chunky-bow-ear-warmer-quick-30-min-pattern',
-  'free-cat-buddy-halloween-amigurumi-black-cat-plush-easy',
-  'free-frog-buddy-halloween-amigurumi-witch-hat-frog-easy-plush',
-  'free-ghost-pop-ghost-in-pumpkin-30-min-pop-toy-pattern',
-  'free-halloween-bat-keychains-low-sew-easy-pattern',
-  'free-crochet-spider-and-web-tutorial-spooky-cute-halloween-2026',
-  'free-viral-crochet-kawaii-bats-halloween-fall-decor',
-  'crochet-ghost-bag-charm-halloween-bag',
-  'free-halloween-set-fingerless-gloves-ghost-mug-cozy',
-  'free-chunky-fall-leg-warmers-quick-2-hour-pattern-sara-rain-crochet',
-  'free-cozy-halloween-beanie-quick-crochet-pattern',
-  'free-cozy-fall-fingerless-gloves-quick-1-hour-make',
-  'free-cozy-twisted-ear-warmer-quick-30-min-pattern',
-  'free-chunky-fall-beanie-cozy-pattern',
-  'free-mini-bat-keychains-low-sew',
-  'mini-pumpkin-30-min-pattern-tutorial',
-  'crochet-black-cat-in-pumpkin-tutorial',
-  'crochet-ghost-in-jack-o-lantern-tutorial',
-  'crochet-halloween-bat-tutorial-sara-rain-crochet',
-  'crochet-cozy-socks',
-  'crochet-dog-bandana',
-  'crochet-cardigan-tutorial',
-  'easy-crochet-baby-booties-pattern-for-beginners-sara-rain-crochet',
-  'crochet-beanie-for-beginners-sara-rain-crochet',
-  'crochet-bookmark-tutorial-sara-rain-crochet',
+  'crochet-baby-booties',
+  'crochet-beanie',
+  'crochet-bookmark',
   'crochet-bucket-hat',
-  'first-crochet-project',
-  'granny-square',
-  'yarn-guide',
-  'amigurumi',
-  'crochet-flower',
-  'how-to-read-crochet-patterns',
-  'single-vs-double-crochet',
-  'crochet-hook-sizes-guide',
-  'how-to-fix-crochet-mistakes',
-  'crochet-blanket-for-beginners'
+  'crochet-cardigan',
+  'crochet-crop-top',
+  'crochet-dog-bandana',
+  'crochet-ear-warmer',
+  'crochet-fingerless-gloves',
+  'crochet-headband',
+  'crochet-keychain',
+  'crochet-laptop-sleeve',
+  'crochet-mug-cozy',
+  'crochet-pencil-bag',
+  'crochet-pet-sweater',
+  'crochet-pillow-cover',
+  'crochet-placemat',
+  'crochet-plant-hanger',
+  'crochet-scrunchie',
+  'crochet-socks',
+  'crochet-table-runner',
+  'crochet-tote-bag',
+  'crochet-wall-hanging',
+  'easy-crochet-baby-blanket-pattern-for-beginners-sara-rain-crochet'
 ]);
 
 const esc = (value) => String(value || '')
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/\"/g, '&quot;');
+  .replace(/&/g, '&')
+  .replace(/</g, '<')
+  .replace(/>/g, '>')
+  .replace(/"/g, '"');
 
 function filterHomepageCards(html) {
   if (!html) return html;
   let updated = html;
   for (const hiddenSlug of HIDDEN_HOME_SLUGS) {
     const cardRe = new RegExp(
-      '<a[^>]*class=["\\\'][^"\\\']*pinterest-card[^"\\\']["\\\'][^>]*href=["\\\']/posts/' +
-        hiddenSlug +
-        '\\\\.html["\\\'][^>]*>.*?</a>',
-      'gis'
+      '<a[^>]*class=["\'][^"\']*pinterest-card[^"\']*["\'][^>]*href=["\']/posts/' +
+        hiddenSlug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
+        '\\.html["\'][^>]*>[\\s\\S]*?</a>',
+      'gi'
     );
     updated = updated.replace(cardRe, '');
   }
@@ -133,53 +101,7 @@ function cardForPost(post) {
 
 async function ensureAutomaticHomepageCards(html) {
   if (!html) return html;
-  // Do not auto-add posts to the homepage. The homepage card list in index.html is authoritative.
   return filterHomepageCards(html);
-  /*
-  const posts = await publishedPosts();
-  let updated = filterHomepageCards(html);
-  if (!posts.length) return updated;
-
-  const gridStart = updated.search(/<div\s+class=["']pinterest-grid["'][^>]*>/i);
-  if (gridStart < 0) return updated;
-  const openEnd = updated.indexOf('>', gridStart) + 1;
-  if (openEnd <= 0) return updated;
-
-  let depth = 0;
-  let pos = gridStart;
-  const tagRe = /<\/?div\b[^>]*>/gi;
-  tagRe.lastIndex = gridStart;
-  let closingGrid = -1;
-  let match;
-  while ((match = tagRe.exec(updated))) {
-    if (match.index < gridStart) continue;
-    const token = match[0];
-    if (/^<div\b/i.test(token)) depth++;
-    else depth--;
-    if (depth === 0) {
-      closingGrid = match.index;
-      break;
-    }
-  }
-  if (closingGrid < 0) return updated;
-
-  const gridContent = updated.slice(openEnd, closingGrid);
-  const existingSlugs = new Set();
-  const hrefRe = /href=["']\/posts\/([^"']+)\.html["']/gi;
-  let hrefMatch;
-  while ((hrefMatch = hrefRe.exec(gridContent))) {
-    existingSlugs.add(decodeURIComponent(hrefMatch[1]).toLowerCase());
-  }
-
-  const missingCards = posts
-    .filter((post) => !existingSlugs.has(String(post.slug).toLowerCase()))
-    .map(cardForPost)
-    .filter(Boolean)
-    .join('\n');
-
-  if (!missingCards) return updated;
-  return updated.slice(0, closingGrid) + '\n' + missingCards + '\n' + updated.slice(closingGrid);
-  */
 }
 
 function slugify(value) {
@@ -197,10 +119,10 @@ function injectUploadedImage(html, image, title) {
   if (html.includes(image)) return html;
   if (html.includes('{{PIN_IMAGE}}')) return html.replaceAll('{{PIN_IMAGE}}', image);
   const safeTitle = String(title || 'Crochet tutorial')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\"/g, '&quot;');
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"');
   const tag = '<img src="' + image + '" alt="' + safeTitle + ' crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">';
   const mainRe = new RegExp('<main[^>]*>.*?</main>', 'is');
   const mainMatch = html.match(mainRe);
@@ -266,7 +188,6 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // Redirect ONLY the built-in workers.dev hostname. Nothing else runs first.
     if (url.hostname === "crochet.krawielvis.workers.dev") {
       return Response.redirect(
         "https://sararaincrochet.com" + url.pathname + url.search,
@@ -309,3 +230,5 @@ export default {
     });
   },
 };
+
+// Deploy trigger: hide 25 blank homepage cards 2026-09-21
