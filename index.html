@@ -58,6 +58,7 @@
         try {
           const response = await fetch(link.href, { cache: 'no-store' });
           const markup = await response.text();
+          history.pushState({ article: true }, '', link.href);
           document.open();
           document.write(markup);
           document.close();
@@ -65,6 +66,13 @@
           window.location.href = link.href;
         }
       });
+    });
+
+    // Firefox: going Back from a rendered article returns to the homepage.
+    window.addEventListener('popstate', event => {
+      if (location.pathname.startsWith('/posts/')) {
+        window.location.href = '/';
+      }
     });
   </script>
   <footer id="stories" class="site-footer">
