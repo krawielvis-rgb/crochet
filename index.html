@@ -50,6 +50,23 @@
       <a class="pinterest-card" href="/posts/my-orange-bat-bandana-halloween.html"><img src="/images/pins/pin-my-orange-bat-bandana-halloween.webp" alt="My Orange Bat Bandana - Halloween" loading="lazy"><div class="pinterest-card-content"><h3>My Orange Bat Bandana - Halloween</h3><span>Read tutorial →</span></div></a>
     </div></div></section>
   </main>
+  <script>
+    // Render the three featured article links as HTML even if the Worker returns them with a text MIME type.
+    document.querySelectorAll('.post-grid .post-card a[href^="/posts/"]').forEach(link => {
+      link.addEventListener('click', async event => {
+        event.preventDefault();
+        try {
+          const response = await fetch(link.href, { cache: 'no-store' });
+          const markup = await response.text();
+          document.open();
+          document.write(markup);
+          document.close();
+        } catch {
+          window.location.href = link.href;
+        }
+      });
+    });
+  </script>
   <footer id="stories" class="site-footer">
   <div class="site-footer-brand">
     <strong>Sara Rain Crochet</strong>
