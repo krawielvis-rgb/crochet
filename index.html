@@ -52,7 +52,7 @@
   </main>
   <script>
     // Render the three featured article links as HTML even if the Worker returns them with a text MIME type.
-    document.querySelectorAll('.post-grid .post-card a[href^="/posts/"]').forEach(link => {
+    document.querySelectorAll('.post-grid .post-card a[href^="/posts/"], .topic-grid a[href^="/posts/"]').forEach(link => {
       link.addEventListener('click', async event => {
         event.preventDefault();
         try {
