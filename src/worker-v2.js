@@ -152,32 +152,38 @@ export default{async fetch(r,e,ctx){
     return new Response(h,{status:a.status,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
   }
   if(u.pathname.startsWith('/posts/')){
-    const topicCardSlugs=['granny-square','yarn-guide','amigurumi','how-to-crochet-a-scarf','crochet-blanket-for-beginners'];
-    const topicSlug=u.pathname.split('/').pop().replace(/\.html$/,'');
-    if(topicCardSlugs.includes(topicSlug)){
-      const topic=await fetch(RAW+u.pathname,{cf:{cacheTtl:300}});
-      if(topic.ok){
-        const html=injectPostStyles(await topic.text());
-        return new Response(html,{status:200,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
+    const sl=u.pathname.split('/').pop().replace(/\.html$/,'');
+    const hdr={'content-type':'text/html; charset=utf-8','cache-control':'no-store'};
+    try{
+      const p=(await posts(e)).find(x=>x.slug===sl);
+      if(p&&(p.materials||p.intro||p.steps||p.rawContent)){
+        return new Response(page(p),{headers:{...hdr,'cache-control':'public, max-age=60'}});
       }
+    }catch{}
+    try{
+      const a=await e.ASSETS.fetch(r);
+      if(a.ok){
+        const ct=(a.headers.get('content-type')||'');
+        if(ct.includes('html')||u.pathname.endsWith('.html')){
+          return new Response(injectPostStyles(await a.text()),{status:a.status,headers:hdr});
+        }
+        return a;
+      }
+    }catch{}
+    for(const path of [`${RAW}/public/posts/${sl}.html`,`${RAW}/posts/${sl}.html`]){
+      try{
+        const x=await fetch(path,{cf:{cacheTtl:60}});
+        if(x.ok){
+          return new Response(injectPostStyles(await x.text()),{status:200,headers:hdr});
+        }
+      }catch{}
     }
-    const sl=topicSlug;const p=(await posts(e)).find(x=>x.slug===sl);
-    if(p&&(p.materials||p.intro||p.steps||p.rawContent))return new Response(page(p),{headers:{'content-type':'text/html; charset=utf-8','cache-control':'public, max-age=60'}});
-    const a=await e.ASSETS.fetch(r);
-    if(a.ok){
-      const html=injectPostStyles(await a.text());
-      return new Response(html,{status:a.status,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
-    }
-    const x=await fetch(`${RAW}${u.pathname}`,{cf:{cacheTtl:300}});
-    if(x.ok){
-      const html=injectPostStyles(await x.text());
-      return new Response(html,{status:x.status,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
-    }
-    return new Response('Not found',{status:404});
+    return new Response('Not found',{status:404,headers:hdr});
   }
   if(u.pathname.startsWith('/images/pins/')){
     const a=await e.ASSETS.fetch(r);if(a.ok)return a;
     const x=await fetch(`${RAW}${u.pathname}`,{cf:{cacheTtl:300}});if(x.ok)return x;
+    const y=await fetch(`${RAW}/public${u.pathname}`,{cf:{cacheTtl:300}});if(y.ok)return y;
   }
   return e.ASSETS.fetch(r);
 }};
