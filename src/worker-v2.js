@@ -230,7 +230,20 @@ export default{async fetch(r,e){
   if(u.pathname.startsWith('/posts/')){
     const sl=u.pathname.split('/').pop().replace(/\.html$/,'');const p=(await posts(e)).find(x=>x.slug===sl);
     if(p&&(p.materials||p.intro||p.steps||p.rawContent))return new Response(page(p),{headers:{'content-type':'text/html; charset=utf-8','cache-control':'public, max-age=60'}});
-    const a=await e.ASSETS.fetch(r);if(a.ok)return a;const x=await fetch(`${RAW}${u.pathname}`,{cf:{cacheTtl:300}});if(x.ok)return x
+    const a=await e.ASSETS.fetch(r);
+    if(a.ok){
+      const headers=new Headers(a.headers);
+      headers.set('content-type','text/html; charset=utf-8');
+      headers.set('cache-control','no-store, no-cache, must-revalidate');
+      return new Response(a.body,{status:a.status,statusText:a.statusText,headers});
+    }
+    const x=await fetch(`${RAW}${u.pathname}`,{cf:{cacheTtl:300}});
+    if(x.ok){
+      const headers=new Headers(x.headers);
+      headers.set('content-type','text/html; charset=utf-8');
+      headers.set('cache-control','no-store, no-cache, must-revalidate');
+      return new Response(x.body,{status:x.status,statusText:x.statusText,headers});
+    }
   }
   if(u.pathname.startsWith('/images/pins/')){
     const a=await e.ASSETS.fetch(r);if(a.ok)return a;const x=await fetch(`${RAW}${u.pathname}`,{cf:{cacheTtl:300}});if(x.ok)return x
