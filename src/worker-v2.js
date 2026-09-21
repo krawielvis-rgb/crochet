@@ -228,6 +228,19 @@ export default{async fetch(r,e){
     return new Response(h,{headers:new Headers({...Object.fromEntries(a.headers),'cache-control':'no-store, no-cache, must-revalidate'})})
   }
   if(u.pathname.startsWith('/posts/')){
+    // These homepage topic-card pages live in the repository's /posts folder.
+    // Fetch them from GitHub first so an assets fallback cannot replace them with a generic HTML shell.
+    const topicCardSlugs=['granny-square','yarn-guide','amigurumi'];
+    const topicSlug=u.pathname.split('/').pop().replace(/\.html$/,'');
+    if(topicCardSlugs.includes(topicSlug)){
+      const topic=await fetch(RAW+u.pathname,{cf:{cacheTtl:300}});
+      if(topic.ok){
+        const headers=new Headers(topic.headers);
+        headers.set('content-type','text/html; charset=utf-8');
+        headers.set('cache-control','no-store, no-cache, must-revalidate');
+        return new Response(topic.body,{status:topic.status,statusText:topic.statusText,headers});
+      }
+    }
     const sl=u.pathname.split('/').pop().replace(/\.html$/,'');const p=(await posts(e)).find(x=>x.slug===sl);
     if(p&&(p.materials||p.intro||p.steps||p.rawContent))return new Response(page(p),{headers:{'content-type':'text/html; charset=utf-8','cache-control':'public, max-age=60'}});
     const a=await e.ASSETS.fetch(r);
