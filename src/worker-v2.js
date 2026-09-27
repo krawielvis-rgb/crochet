@@ -187,6 +187,22 @@ export default{async fetch(r,e,ctx){
     }
     return new Response('Not found',{status:404,headers:hdr});
   }
+  if(u.pathname==='/sitemap.xml'||u.pathname==='/sitemaps.xml'){
+    const list=await posts(e);
+    const today=new Date().toISOString().slice(0,10);
+    const staticPages=['/','/about','/contact','/privacy-policy','/cookie-policy','/terms'];
+    let xml='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+    for(const p of staticPages){
+      const loc=p==='/'?'https://sararaincrochet.com/':`https://sararaincrochet.com${p}`;
+      xml+=`  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>${p==='/'?'weekly':'yearly'}</changefreq><priority>${p==='/'?'1.0':'0.4'}</priority></url>\n`;
+    }
+    for(const p of list){
+      if(!p.slug)continue;
+      xml+=`  <url><loc>https://sararaincrochet.com/posts/${p.slug}.html</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>\n`;
+    }
+    xml+='</urlset>\n';
+    return new Response(xml,{headers:{'content-type':'application/xml; charset=utf-8','cache-control':'public, max-age=3600'}});
+  }
   if(u.pathname.startsWith('/images/pins/')){
     const a=await e.ASSETS.fetch(r);if(a.ok)return a;
     const x=await fetch(`${RAW}${u.pathname}`,{cf:{cacheTtl:300}});if(x.ok)return x;
