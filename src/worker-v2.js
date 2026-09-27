@@ -33,8 +33,15 @@ function resolveImage(p){
   return '';
 }
 
+function cleanReviewTitles(html){
+  if(!html||typeof html!=='string')return html;
+  return html
+    .replace(/Punk Checkered Tote - LONG Beginner Tutorial - Fixed 10\/10 - Sara Rain Crochet/g,'Punk Checkered Tote – Beginner Crochet Tutorial | Sara Rain Crochet')
+    .replace(/Punk Checkered Tote - LONG Beginner Tutorial - Fixed 10\/10/g,'Punk Checkered Tote – Beginner Crochet Tutorial');
+}
 function injectPostStyles(html){
   if(!html||typeof html!=='string')return html;
+  html=cleanReviewTitles(html);
   if(html.includes('id="critical-site"'))return html;
   const critical=`<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;500;600;700&family=Fraunces:opsz,wght@9..144,500;600&display=swap" rel="stylesheet"><style id="critical-site">:root{--ink:#21312c;--paper:#f7f4ed;--red:#d85e4b;--line:rgba(33,49,44,.18)}*{box-sizing:border-box}body{margin:0;background:var(--paper)!important;color:var(--ink)!important;font-family:'DM Sans',system-ui,sans-serif!important;font-size:16px;line-height:1.6}a{color:inherit;text-decoration:none}.site-header{height:84px;padding:0 5.5vw;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:var(--paper);position:relative;z-index:4}.brand{display:flex;gap:10px;align-items:center;font-family:Fraunces,Georgia,serif;font-size:22px;font-weight:600;color:var(--ink)!important}.brand-mark{width:30px;height:30px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:18px}.site-header nav{display:flex;gap:35px;font-size:14px}.site-header nav a{color:var(--ink)!important;text-decoration:none}.site-header nav a:hover{color:var(--red)}.button,.button-small{display:inline-flex;align-items:center;gap:12px;background:var(--ink);color:var(--paper)!important;padding:10px 14px;font-size:12px;font-weight:600;border:0;text-decoration:none}.button span,.button-small span{font-size:17px}.article{max-width:900px;margin:0 auto;padding:92px 30px 105px}.article>h1{font-family:Fraunces,Georgia,serif;font-size:clamp(42px,6vw,72px);font-weight:500;letter-spacing:-1.5px;line-height:1.05;margin:13px 0 23px;color:var(--ink)}.meta{font:500 10px 'DM Mono',monospace;letter-spacing:1.3px;text-transform:uppercase;color:#77877e;margin-bottom:12px}.dek{font-family:Fraunces,Georgia,serif;font-size:clamp(18px,2.4vw,26px);line-height:1.35;max-width:700px;color:#53635b;margin-bottom:36px}.article-image,.pin-image{width:100%;max-height:520px;object-fit:cover;border-radius:12px;margin:24px 0;display:block}@media(max-width:700px){.site-header nav{display:none}.article{padding:70px 18px 80px}}</style>`;
   if(/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, m=>m+critical);
