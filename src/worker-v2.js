@@ -24,12 +24,22 @@ const paras=x=>String(x||'').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean).m
 const lis=x=>Array.isArray(x)?x.map(s=>`<li>${esc(s)}</li>`).join(''):String(x||'').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>`<li>${esc(s)}</li>`).join('');
 const slug=x=>String(x).toLowerCase().trim().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80);
 
-const IMAGE_BY_SLUG={};
+const IMAGE_BY_SLUG={
+  'halloween-wind-spinner-5-in-1-tutorial':'/images/pins/pin-free-halloween-wind-spinner-5-in-1-tutorial.webp',
+  'free-winter-crochet-penguin':'/images/pins/pin-free-winter-crochet-penguin-cute-amigurumi-and-easy-pattern-beginner-tutorial.webp',
+  'free-fall-crochet-pumpkins':'/images/pins/pin-free-fall-crochet-pumpkins-beginner-tutorial-with-pictures.webp',
+  'free-mini-cat-keychains':'/images/pins/pin-free-mini-cat-keychains-low-sew-black-cat-with-bow.webp',
+  'free-halloween-bat-keychains':'/images/pins/pin-free-halloween-bat-keychains-low-sew-easy-pattern.webp',
+  'free-chunky-fall-beanie-cozy-pattern':'/images/pins/pin-free-chunky-fall-beanie-cozy-pattern.jpg',
+  'free-halloween-hair-clips-crochet-pattern-8-spooky-clips':'/images/pins/pin-free-halloween-hair-clips-crochet-pattern-8-spooky-clips.webp',
+  'free-crochet-frog-witch-halloween-amigurumi':'/images/pins/pin-free-crochet-frog-witch-halloween-amigurumi.webp',
+  'free-fall-crochet-charms-bag-charms-and-keychains-ghost-bat-pumpkin-mushroom-lat':'/images/pins/pin-free-fall-crochet-charms-bag-charms-and-keychains-ghost-bat-pumpkin-mushroom-lat.webp',
+};
 function resolveImage(p){
   if(!p)return '';
   if(IMAGE_BY_SLUG[p.slug])return IMAGE_BY_SLUG[p.slug];
   if(p.image)return p.image;
-  if(p.slug)return `/images/pins/pin-${p.slug}.jpg`;
+  if(p.slug)return `/images/pins/pin-${p.slug}.webp`;
   return '';
 }
 
