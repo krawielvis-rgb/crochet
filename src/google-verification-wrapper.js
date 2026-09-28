@@ -195,11 +195,43 @@ export default {
       );
     }
     if (url.pathname === '/sitemap.xml' || url.pathname === '/sitemaps.xml') {
-      return new Response(SITEMAP, {
+      let xml = SITEMAP;
+      try {
+        const postsRes = await tutorialWorker.fetch(new Request(new URL('/api/posts', request.url), { method: 'GET' }), env, ctx);
+        if (postsRes.ok) {
+          const list = await postsRes.json();
+          if (Array.isArray(list) && list.length) {
+            const today = new Date().toISOString().slice(0, 10);
+            const staticPages = [
+              ['https://sararaincrochet.com/', '1.0', 'weekly'],
+              ['https://sararaincrochet.com/about.html', '0.4', 'yearly'],
+              ['https://sararaincrochet.com/contact.html', '0.4', 'yearly'],
+              ['https://sararaincrochet.com/privacy-policy.html', '0.3', 'yearly'],
+              ['https://sararaincrochet.com/cookie-policy.html', '0.3', 'yearly'],
+              ['https://sararaincrochet.com/terms.html', '0.3', 'yearly'],
+              ['https://sararaincrochet.com/pinterest-tutorials.html', '0.6', 'weekly'],
+            ];
+            const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
+            for (const [loc, pri, freq] of staticPages) {
+              lines.push(`  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>${freq}</changefreq><priority>${pri}</priority></url>`);
+            }
+            const seen = new Set();
+            for (const p of list) {
+              const s = String((p && p.slug) || '').trim();
+              if (!s || seen.has(s)) continue;
+              seen.add(s);
+              lines.push(`  <url><loc>https://sararaincrochet.com/posts/${s}.html</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`);
+            }
+            lines.push('</urlset>');
+            xml = lines.join('\n') + '\n';
+          }
+        }
+      } catch (e) {}
+      return new Response(xml, {
         status: 200,
         headers: {
           'Content-Type': 'application/xml; charset=UTF-8',
-          'Cache-Control': 'public, max-age=3600',
+          'Cache-Control': 'public, max-age=300',
         },
       });
     }
@@ -231,4 +263,4 @@ export default {
   },
 };
 
-// Deploy trigger: hide 25 blank homepage cards 2026-09-21
+// Deploy trigger: full dynamic sitemap 2026-09-28
