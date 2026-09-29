@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Public site map for crawlers
 Sitemap: https://sararaincrochet.com/sitemap.xml
+
+# Admin area is not for indexing
+User-agent: *
+Disallow: /sara
+Disallow: /api/admin
