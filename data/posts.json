@@ -1,5 +1,14 @@
 [
   {
+    "slug": "react-artifact",
+    "title": "React Artifact",
+    "description": "React Artifact — a step-by-step crochet tutorial from Sara Rain Crochet.",
+    "category": "Crochet tutorial",
+    "readTime": "12 min read",
+    "image": "/images/pins/pin-react-artifact.webp",
+    "published": true
+  },
+  {
     "slug": "crochet-cinnamon-roll-coasters",
     "title": "Crochet Cinnamon Roll Coasters",
     "description": "Crochet Cinnamon Roll Coasters — a step-by-step crochet tutorial from Sara Rain Crochet.",
