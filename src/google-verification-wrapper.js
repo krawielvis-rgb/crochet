@@ -21,6 +21,8 @@ const SITEMAP = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>https://sararaincrochet.com/terms.html</loc></url>
   <url><loc>https://sararaincrochet.com/contact.html</loc></url>
   <url><loc>https://sararaincrochet.com/pinterest-tutorials.html</loc></url>
+  <url><loc>https://sararaincrochet.com/disclaimer.html</loc></url>
+  <url><loc>https://sararaincrochet.com/search.html</loc></url>
 </urlset>`;
 
 const HIDDEN_HOME_SLUGS = new Set([
@@ -55,10 +57,10 @@ const HIDDEN_HOME_SLUGS = new Set([
 ]);
 
 const esc = (value) => String(value || '')
-  .replace(/&/g, '&')
-  .replace(/</g, '<')
-  .replace(/>/g, '>')
-  .replace(/"/g, '"');
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
 
 function filterHomepageCards(html) {
   if (!html) return html;
@@ -119,10 +121,10 @@ function injectUploadedImage(html, image, title) {
   if (html.includes(image)) return html;
   if (html.includes('{{PIN_IMAGE}}')) return html.replaceAll('{{PIN_IMAGE}}', image);
   const safeTitle = String(title || 'Crochet tutorial')
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
   const tag = '<img src="' + image + '" alt="' + safeTitle + ' crochet tutorial" style="max-width:100%;height:auto;display:block;margin:24px auto;">';
   const mainRe = new RegExp('<main[^>]*>.*?</main>', 'is');
   const mainMatch = html.match(mainRe);
@@ -210,6 +212,8 @@ export default {
               ['https://sararaincrochet.com/cookie-policy.html', '0.3', 'yearly'],
               ['https://sararaincrochet.com/terms.html', '0.3', 'yearly'],
               ['https://sararaincrochet.com/pinterest-tutorials.html', '0.6', 'weekly'],
+              ['https://sararaincrochet.com/disclaimer.html', '0.3', 'yearly'],
+              ['https://sararaincrochet.com/search.html', '0.5', 'weekly'],
             ];
             const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
             for (const [loc, pri, freq] of staticPages) {
@@ -263,4 +267,4 @@ export default {
   },
 };
 
-// Deploy trigger: full dynamic sitemap 2026-09-28
+// Deploy trigger: diagram checklist disclaimer + search 2026-09-29
