@@ -121,6 +121,14 @@ async function deletePost(r,e){
   return out({ok:true,removed:s});
 }
 
+function injectCookieBanner(html){
+  if(!html||typeof html!=='string')return html;
+  if(html.includes('id="sara-cookie-banner"'))return html;
+  const snip=`\n<style id="sara-cookie-style">\n#sara-cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:99999;max-width:520px;margin:0 auto;background:#fffdf9;color:#19302b;border:1px solid rgba(25,48,43,.14);border-radius:18px;box-shadow:0 16px 40px rgba(25,48,43,.14);padding:16px 18px;font:15px/1.5 'DM Sans',system-ui,sans-serif}\n#sara-cookie-banner p{margin:0 0 12px;color:#59655e;font-size:14px;line-height:1.55}\n#sara-cookie-banner a{color:#9b5148;font-weight:600;text-decoration:underline}\n#sara-cookie-banner .sara-cookie-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}\n#sara-cookie-banner button{border:0;border-radius:999px;padding:10px 16px;font:600 13px 'DM Sans',system-ui,sans-serif;cursor:pointer}\n#sara-cookie-banner .sara-cookie-accept{background:#19302b;color:#f4f0e8}\n#sara-cookie-banner .sara-cookie-accept:hover{opacity:.92}\n@media(min-width:700px){#sara-cookie-banner{left:24px;right:auto;margin:0;width:min(420px,calc(100vw - 48px))}}\n</style>\n<div id="sara-cookie-banner" role="dialog" aria-live="polite" aria-label="Cookie notice" hidden>\n  <p>We use cookies for analytics and (later) ads, and to remember your preferences. See our <a href="/cookie-policy.html">Cookie Policy</a>.</p>\n  <div class="sara-cookie-actions">\n    <button type="button" class="sara-cookie-accept" id="sara-cookie-accept">Accept</button>\n    <a href="/cookie-policy.html" style="border-radius:999px;display:inline-block;text-decoration:none;border:1px solid rgba(25,48,43,.18);padding:9px 14px;font:600 13px 'DM Sans',system-ui,sans-serif;color:#19302b">Learn more</a>\n  </div>\n</div>\n<script>\n(function(){\n  try{\n    if(localStorage.getItem('sara_cookie_ok')==='1')return;\n    var b=document.getElementById('sara-cookie-banner');\n    if(!b)return;\n    b.hidden=false;\n    var btn=document.getElementById('sara-cookie-accept');\n    if(btn)btn.addEventListener('click',function(){\n      try{localStorage.setItem('sara_cookie_ok','1');}catch(e){}\n      b.remove();\n    });\n  }catch(e){}\n})();\n</script>`;
+  if(/<\/body>/i.test(html)) return html.replace(/<\/body>/i, snip+'</body>');
+  return html+snip;
+}
+
 export default{async fetch(r,e){
   const u=new URL(r.url);
   if(u.pathname==='/api/posts')return out(await posts(e));
@@ -176,7 +184,7 @@ export default{async fetch(r,e){
         }
       }
     }catch(err){}
-    return new Response(h,{status:200,headers:{'content-type':'text/html;charset=utf-8','cache-control':'public,max-age=60'}});
+    return new Response(injectCookieBanner(h),{status:200,headers:{'content-type':'text/html;charset=utf-8','cache-control':'public,max-age=60'}});
   }
   if(u.pathname==='/amazon-finds.html'||u.pathname==='/amazon-finds'){
     let res=await e.ASSETS.fetch(new Request(new URL('/amazon-finds.html',r.url),{method:'GET'}));
@@ -198,7 +206,16 @@ export default{async fetch(r,e){
         }
       }
     }catch(err){}
-    return new Response(html,{status:200,headers:{'content-type':'text/html;charset=utf-8','cache-control':'no-store'}});
+    return new Response(injectCookieBanner(html),{status:200,headers:{'content-type':'text/html;charset=utf-8','cache-control':'no-store'}});
   }
-  return e.ASSETS.fetch(r);
+  {
+    const res=await e.ASSETS.fetch(r);
+    const ct=(res.headers.get('content-type')||'').toLowerCase();
+    if(ct.includes('text/html')||/\.html?$/i.test(u.pathname)||u.pathname==='/'||u.pathname.endsWith('/')){
+      let body=await res.text();
+      body=injectCookieBanner(body);
+      return new Response(body,{status:res.status,headers:{'content-type':'text/html;charset=utf-8','cache-control':res.headers.get('cache-control')||'public,max-age=60'}});
+    }
+    return res;
+  }
 }};
