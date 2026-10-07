@@ -78,7 +78,6 @@ async function publishHtml(r,e){
   if(m){ext=m[1]==='png'?'png':m[1]==='webp'?'webp':'jpg';image=`/images/pins/pin-${s}.${ext}`;}
   else if(existing&&existing.image){image=existing.image;}
   else {return out({error:'Upload a JPG, PNG, or WebP pin image.'},400);}
-  const url=`https://sararaincrochet.com/posts/${s}.html`;
   if(m){const imgRe=/<img\b([^>]*?)\bsrc\s*=\s*(['"])(.*?)\2([^>]*)>/i;if(imgRe.test(html))html=html.replace(imgRe,(mm,a,q,src,b)=>`<img${a}src=${q}${image}${q}${b}>`);}
   const ref=await g(`${API}/git/ref/heads/${BRANCH}`,e);
   const head=ref.object.sha;
@@ -151,8 +150,7 @@ export default{async fetch(r,e){
     if(!res.ok){
       const raw=await fetch(`${RAW}/public/posts/${s}.html`);
       if(!raw.ok)return out({error:'Post HTML not found'},404);
-      const html=await raw.text();
-      return out({html,title:s});
+      return out({html:await raw.text(),title:s});
     }
     return out({html:await res.text(),title:s});
   }
@@ -188,13 +186,19 @@ export default{async fetch(r,e){
       const amz=list.filter(p=>isAmz(p));
       const cards=amz.map(p=>`<a class="affiliate-card" href="/posts/${p.slug}.html"><img src="${esc(p.image||'')}" alt="${esc(p.title||'')}" loading="lazy"><div class="affiliate-card-content"><h3>${esc(p.title||'')}</h3><span class="tag">Amazon · Read →</span></div></a>`).join('');
       const gridStart=html.search(/<div\s+class=["']affiliate-grid["'][^>]*>/i);
-      if(gridStart>=0&&cards){
+      if(gridStart>=0){
         const openEnd=html.indexOf('>',gridStart)+1;
-        const close=html.indexOf('</div>',openEnd);
-        if(close>0) html=html.slice(0,openEnd)+cards+html.slice(close);
+        let depth=1,i=openEnd;
+        while(i<html.length&&depth>0){
+          const nextOpen=html.indexOf('<div',i);
+          const nextClose=html.indexOf('</div>',i);
+          if(nextClose<0)break;
+          if(nextOpen>=0&&nextOpen<nextClose){depth++;i=nextOpen+4;}
+          else{depth--;i=nextClose+6;if(depth===0){html=html.slice(0,openEnd)+cards+html.slice(nextClose);break;}}
+        }
       }
     }catch(err){}
-    return new Response(html,{status:200,headers:{'content-type':'text/html;charset=utf-8','cache-control':'public,max-age=60'}});
+    return new Response(html,{status:200,headers:{'content-type':'text/html;charset=utf-8','cache-control':'no-store'}});
   }
   return e.ASSETS.fetch(r);
 }};
