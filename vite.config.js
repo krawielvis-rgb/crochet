@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import seoContentUpgrade from './src/seo-upgrade.js'
 
@@ -103,8 +104,26 @@ const homepagePencilBagPlugin = {
   }
 }
 
+const legalFooterPlugin = {
+  name: 'legal-footer-all-public-posts',
+  closeBundle() {
+    const postsDir = resolve(import.meta.dirname, 'dist/posts')
+    const legalFooter = `<footer class="adsense-legal-footer" style="padding:28px 5.5vw;text-align:center;background:#21312c;color:#f7f4ed;font:13px/1.7 Arial,sans-serif"><strong>Sara Rain Crochet</strong><div style="margin-top:8px"><a href="/about.html" style="color:inherit;margin:0 8px">About</a><a href="/contact.html" style="color:inherit;margin:0 8px">Contact</a><a href="/privacy-policy.html" style="color:inherit;margin:0 8px">Privacy Policy</a><a href="/cookie-policy.html" style="color:inherit;margin:0 8px">Cookie Policy</a><a href="/terms.html" style="color:inherit;margin:0 8px">Terms</a></div><div style="margin-top:6px">© 2026 Sara Rain Crochet. All rights reserved.</div></footer>`
+    if (!statSync(postsDir, { throwIfNoEntry: false })?.isDirectory()) return
+    for (const name of readdirSync(postsDir)) {
+      if (!name.endsWith('.html')) continue
+      const file = resolve(postsDir, name)
+      let html = readFileSync(file, 'utf8')
+      if (!html.includes('adsense-legal-footer')) {
+        html = html.replace(/<\/body>/i, `${legalFooter}\n</body>`)
+        writeFileSync(file, html)
+      }
+    }
+  }
+}
+
 export default defineConfig({
-  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin],
+  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, legalFooterPlugin],
   build: {
     rollupOptions: {
       input: {
