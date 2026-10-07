@@ -136,9 +136,12 @@ export default{async fetch(r,e){
   if(u.pathname==='/api/admin/delete'&&r.method==='POST')return deletePost(r,e);
   if(u.pathname==='/api/admin/login'&&r.method==='POST'){
     const d=await r.json().catch(()=>({}));
-    const id=String(d.identifier||d.username||d.email||'').trim();
+    const id=String(d.identifier||d.username||d.email||'').trim().toLowerCase();
     const pw=String(d.password||'');
-    const ok=(e.ADMIN_USER&&id===e.ADMIN_USER||e.ADMIN_EMAIL&&id===e.ADMIN_EMAIL)&&(pw&&pw===(e.ADMIN_PASSWORD||''));
+    const un=String(e.ADMIN_USERNAME||e.ADMIN_USER||'').trim().toLowerCase();
+    const em=String(e.ADMIN_EMAIL||'').trim().toLowerCase();
+    if(!e.ADMIN_PASSWORD||(!un&&!em))return out({error:'Admin credentials are not configured.'},500);
+    const ok=pw===e.ADMIN_PASSWORD&&((un&&id===un)||(em&&id===em));
     if(!ok)return out({error:'Invalid credentials'},401);
     const tok=await session(e,id);
     return new Response(JSON.stringify({ok:true}),{status:200,headers:{...J,'set-cookie':`sara_admin=${tok}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=43200`}});
