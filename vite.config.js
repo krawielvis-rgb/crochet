@@ -122,8 +122,33 @@ const legalFooterPlugin = {
   }
 }
 
+// Remove legacy third-party banner ads from every published HTML page,
+// including catalog posts copied from public/posts during the Vite build.
+const removeLegacyBannerAdsPlugin = {
+  name: 'remove-legacy-banner-ads',
+  closeBundle() {
+    const distDir = resolve(import.meta.dirname, 'dist')
+    const clean = (directory) => {
+      if (!statSync(directory, { throwIfNoEntry: false })?.isDirectory()) return
+      for (const entry of readdirSync(directory)) {
+        const file = resolve(directory, entry)
+        if (statSync(file).isDirectory()) { clean(file); continue }
+        if (!entry.endsWith('.html')) continue
+        const original = readFileSync(file, 'utf8')
+        let html = original
+        // Remove standalone ad blocks, not article content or analytics.
+        html = html.replace(/<!-- ADS BANNER[^>]*-->\\s*<div\\s+style="margin:32px auto 28px;max-width:900px;text-align:center;">[\\s\\S]*?<\\/div>\\s*<\\/div>/gi, '')
+        html = html.replace(/<script\\b[^>]*\\bsrc=["'][^"']*profitableratecpmnetwork\\.com[^"']*["'][^>]*><\\/script>/gi, '')
+        html = html.replace(/<div\\s+id=["']container-2c6f0fc07e58621aea96ce4b630ffa15["']\\s*><\\/div>/gi, '')
+        if (html !== original) writeFileSync(file, html)
+      }
+    }
+    clean(distDir)
+  }
+}
+
 export default defineConfig({
-  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, legalFooterPlugin],
+  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, legalFooterPlugin, removeLegacyBannerAdsPlugin],
   build: {
     rollupOptions: {
       input: {
