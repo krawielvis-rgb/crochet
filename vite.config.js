@@ -137,9 +137,9 @@ const removeLegacyBannerAdsPlugin = {
         const original = readFileSync(file, 'utf8')
         let html = original
         // Remove standalone ad blocks, not article content or analytics.
-        html = html.replace(/<!-- ADS BANNER[^>]*-->\\s*<div\\s+style="margin:32px auto 28px;max-width:900px;text-align:center;">[\\s\\S]*?<\\/div>\\s*<\\/div>/gi, '')
-        html = html.replace(/<script\\b[^>]*\\bsrc=["'][^"']*profitableratecpmnetwork\\.com[^"']*["'][^>]*><\\/script>/gi, '')
-        html = html.replace(/<div\\s+id=["']container-2c6f0fc07e58621aea96ce4b630ffa15["']\\s*><\\/div>/gi, '')
+        html = html.replace(/<!-- ADS BANNER[^>]*-->\s*<div\s+style="margin:32px auto 28px;max-width:900px;text-align:center;">[\s\S]*?<\/div>\s*<\/div>/gi, '')
+        html = html.replace(/<script\b[^>]*\bsrc=["'][^"']*profitableratecpmnetwork\.com[^"']*["'][^>]*><\/script>/gi, '')
+        html = html.replace(/<div\s+id=["']container-2c6f0fc07e58621aea96ce4b630ffa15["']\s*><\/div>/gi, '')
         if (html !== original) writeFileSync(file, html)
       }
     }
