@@ -148,31 +148,8 @@ const removeLegacyBannerAdsPlugin = {
 }
 
 // Monetag In-Page Push: load once on every published crochet post.
-const monetagPostAdsPlugin = {
-  name: 'monetag-post-ads',
-  closeBundle() {
-    const postsDir = resolve(import.meta.dirname, 'dist/posts')
-    
-const tag = '<script src="https://quge5.com/88/tag.min.js" data-zone="296102" async data-cfasync="false"></script>'
-
-    const addTag = (file) => {
-      if (!statSync(file, { throwIfNoEntry: false })?.isFile()) return
-      const html = readFileSync(file, 'utf8')
-     if (html.includes('data-zone="296102"')) return
-      writeFileSync(file, html.replace(/<head([^>]*)>/i, `<head$1>${tag}`))
-    }
-    // Monetag may check the site's root URL rather than individual articles.
-    addTag(resolve(import.meta.dirname, 'dist/index.html'))
-    if (statSync(postsDir, { throwIfNoEntry: false })?.isDirectory()) {
-      for (const name of readdirSync(postsDir)) {
-        if (name.endsWith('.html')) addTag(resolve(postsDir, name))
-      }
-    }
-  }
-}
-
 export default defineConfig({
-  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, legalFooterPlugin, removeLegacyBannerAdsPlugin, monetagPostAdsPlugin],
+  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, legalFooterPlugin, removeLegacyBannerAdsPlugin],
   build: {
     rollupOptions: {
       input: {
