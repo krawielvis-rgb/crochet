@@ -152,11 +152,11 @@ const monetagPostAdsPlugin = {
   name: 'monetag-post-ads',
   closeBundle() {
     const postsDir = resolve(import.meta.dirname, 'dist/posts')
-    const tag = `<script>(function(s){s.dataset.zone='12038233',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script><script>(function(s){s.dataset.zone='12038272',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>`
+    const tag = `<script>(function(s){s.dataset.zone='12038272',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>`
     const addTag = (file) => {
       if (!statSync(file, { throwIfNoEntry: false })?.isFile()) return
       const html = readFileSync(file, 'utf8')
-      if (html.includes("s.dataset.zone='12038233'") && html.includes("s.dataset.zone='12038272'")) return
+      if (html.includes("s.dataset.zone='12038272'")) return
       writeFileSync(file, html.replace(/<head([^>]*)>/i, `<head$1>${tag}`))
     }
     // Monetag may check the site's root URL rather than individual articles.
