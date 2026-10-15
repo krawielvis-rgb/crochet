@@ -147,8 +147,25 @@ const removeLegacyBannerAdsPlugin = {
   }
 }
 
+// Monetag In-Page Push: load once on every published crochet post.
+const monetagPostAdsPlugin = {
+  name: 'monetag-post-ads',
+  closeBundle() {
+    const postsDir = resolve(import.meta.dirname, 'dist/posts')
+    if (!statSync(postsDir, { throwIfNoEntry: false })?.isDirectory()) return
+    const tag = `<script>(function(s){s.dataset.zone='12038233',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>`
+    for (const name of readdirSync(postsDir)) {
+      if (!name.endsWith('.html')) continue
+      const file = resolve(postsDir, name)
+      const html = readFileSync(file, 'utf8')
+      if (html.includes("s.dataset.zone='12038233'")) continue
+      writeFileSync(file, html.replace(/<head([^>]*)>/i, `<head$1>\\n${tag}`))
+    }
+  }
+}
+
 export default defineConfig({
-  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, legalFooterPlugin, removeLegacyBannerAdsPlugin],
+  plugins: [tutorialEnhancer, seoContentUpgrade, cohesiveTutorialPlugin, homepagePencilBagPlugin, legalFooterPlugin, removeLegacyBannerAdsPlugin, monetagPostAdsPlugin],
   build: {
     rollupOptions: {
       input: {
