@@ -159,7 +159,7 @@ const monetagPostAdsPlugin = {
       const file = resolve(postsDir, name)
       const html = readFileSync(file, 'utf8')
       if (html.includes("s.dataset.zone='12038233'")) continue
-      writeFileSync(file, html.replace(/<head([^>]*)>/i, `<head$1>\\n${tag}`))
+      writeFileSync(file, html.replace(/<head([^>]*)>/i, `<head$1>${tag}`))
     }
   }
 }
